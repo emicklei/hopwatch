@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 type command struct {
@@ -19,12 +20,21 @@ func (self *command) addParam(key, value string) {
 	self.Parameters[key] = value
 }
 
+var hopwatchEnabled = true
 var currentWebsocket *websocket.Conn
 var toBrowserChannel = make(chan command)
 var fromBrowserChannel = make(chan command)
 var connectChannel = make(chan command)
 
 func init() {
+	// see if disable is needed
+	for _, arg := range os.Args {
+		if arg == "-nobreak" {
+			log.Printf("[hopwatch] disabled.\n")
+			hopwatchEnabled = false
+			return
+		}
+	}
 	http.HandleFunc("/hopwatch.html", writePage)
 	http.Handle("/hopwatch", websocket.Handler(connectHandler))
 	go listen()
@@ -84,6 +94,10 @@ func sendLoop() {
 // Break stops the execution of the program and passes values to the Hopwatch page to show.
 // The execution of the program is resumed after receiving the proceed command. 
 func Break(location string, key string, value interface{}) {
+	if !hopwatchEnabled {
+		log.Printf("%v: %v = %v", location, key, value)
+		return
+	}
 	cmd := command{Action: "watch"}
 	cmd.addParam("go.location", location)
 	cmd.addParam(key, fmt.Sprint(value))

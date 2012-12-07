@@ -5,6 +5,9 @@ It works by communicating to a WebSockets based agent in Javascript.
 When your program calls the Break function, it sends debug information to the browser page and waits for user interaction.
 On the hopwatch page, the developer can view debug information and choose to proceed or terminate the execution of your program.
 
+###Install
+	go get github.com/emicklei/hopwatch
+
 ###Usage
 
 	import (
@@ -18,8 +21,9 @@ On the hopwatch page, the developer can view debug information and choose to pro
 	}
 
 ###Tool
-Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.  
-Your browser must support WebSockets ; it has been tested with Chrome.
+Open the Hopwatch debugger on **http://localhost:23456/hopwatch.html** . Your browser must support HTML5 WebSockets.
+
+To disable the breakpoints in your compiled program, pass the command line argument **-nobreak**
 
 ###Resources
 
