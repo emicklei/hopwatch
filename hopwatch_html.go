@@ -16,66 +16,70 @@ func writePage(w http.ResponseWriter, req *http.Request) {
 	var websocket = new WebSocket(wsUri);	
 	function init() {
 		output = document.getElementById("output");
-		testWebSocket();
+		setupWebSocket();
 	}
-	function testWebSocket() {		
-		websocket.onopen = function(evt) {
-			onOpen(evt)
-		};
-		websocket.onclose = function(evt) {
-			onClose(evt)
-		};
-		websocket.onmessage = function(evt) {
-			onMessage(evt)
-		};
-		websocket.onerror = function(evt) {
-			onError(evt)
-		};
+	function setupWebSocket() {		
+		websocket.onopen = function(evt) { onOpen(evt) };
+		websocket.onclose = function(evt) { onClose(evt) };
+		websocket.onmessage = function(evt) { onMessage(evt) };
+		websocket.onerror = function(evt) { onError(evt) };
 	}
 	function onOpen(evt) {
-		writeToScreen("CONNECTED");
-		doSend('{"Action":"browser"}');
+		writeToScreen("connected","info");
+		sendConnected();
 	}
 	function onClose(evt) {
-		writeToScreen("DISCONNECTED");
+		writeToScreen("disconnected","info");
 	}
 	function onMessage(evt) {
  		try {
-            var json = JSON.parse(evt.data);
+            var cmd = JSON.parse(evt.data);
         } catch (e) {
-            console.log('This doesn\'t look like a valid JSON: ', message.data);
+            console.log('[hopwatch] failed to read valid JSON: ', message.data);
             return;
         }		
-		writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data
-				+ '</span>');		
+        console.log("[hopwatch] received: " + evt.data);
+		writeToScreen(evt.data,"watch");		
 	}
 	function onError(evt) {
-		writeToScreen('<span style="color: red;">ERROR:</span> ' + evt);
-	}
-	function doSend(message) {
-		writeToScreen("SENT: " + message);
-//		if (websocket == null) {
-//			writeToScreen("ws == null");
-//		} else {
-			websocket.send(message);
-//		}
+		writeToScreen(evt,"err");
 	}	
-	function writeToScreen(message) {
-		var pre = document.createElement("p");
-		pre.style.wordWrap = "break-word";
-		pre.innerHTML = message;
-		output.appendChild(pre);
+	function writeToScreen(message,cls) {
+		var tr = document.createElement("tr");
+		var stamp = document.createElement("td");
+		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+		stamp.className = "time"
+		tr.appendChild(stamp);		
+		var td = document.createElement("td");
+		td.className = cls		
+		td.innerHTML = message;
+		tr.appendChild(td);
+		output.appendChild(tr);
+	}	
+	function sendConnected() { doSend('{"Action":"connected"}'); }
+	function sendProceed()   { doSend('{"Action":"proceed"}'); }
+	function sendQuit()      { doSend('{"Action":"quit"}'); }	
+	function doSend(message) {
+		console.log("[hopwatch] send: " + message);
+		websocket.send(message);
 	}
-	
-	function proceed() {
-		doSend('{"Action":"proceed"}');
-	}
-	
 	window.addEventListener("load", init, false);
 </script>
-<h2>Hopwatch Debugger</h2>
-<a href="javascript:proceed();">Proceed</a>
-<div id="output"></div>
+<head>
+	<style>
+	.time   {background-color:#DDD;font-family:"Lucida Console", Monaco, monospace;font-size:small;white-space:nowrap}
+	.watch 	{background-color:#FFF;font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
+	.err 	{background-color:#FF3300;}
+	.info 	{background-color:#CCFFCC;}
+	body 	{background-color:#EEE;}
+	</style>
+</head>
+<body>
+	<h2>Hopwatch Debugger</h2>
+	<p><a href="javascript:sendProceed();">[ Proceed ]</a><a href="javascript:sendQuit();">[ Quit ]</a></p>
+	<table id="output" style="width:100%"></table>
+	<h7><a href="https://github.com/emicklei/hopwatch">hopwatch on github</a></h7>
+</body>
 </html>
 `)
 	return

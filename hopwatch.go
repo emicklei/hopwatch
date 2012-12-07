@@ -7,12 +7,12 @@ import (
 	"net/http"
 )
 
-type Command struct {
+type command struct {
 	Action     string
 	Parameters map[string]string
 }
 
-func (self *Command) addParam(key, value string) {
+func (self *command) addParam(key, value string) {
 	if self.Parameters == nil {
 		self.Parameters = map[string]string{}
 	}
@@ -20,12 +20,13 @@ func (self *Command) addParam(key, value string) {
 }
 
 var currentWebsocket *websocket.Conn
-var toBrowserChannel = make(chan Command)
-var fromBrowserChannel = make(chan Command)
+var toBrowserChannel = make(chan command)
+var fromBrowserChannel = make(chan command)
+var connectChannel = make(chan command)
 
 func init() {
 	http.HandleFunc("/hopwatch.html", writePage)
-	http.Handle("/hopwatch", websocket.Handler(receiveLoop))
+	http.Handle("/hopwatch", websocket.Handler(connectHandler))
 	go listen()
 	go sendLoop()
 }
@@ -37,19 +38,30 @@ func listen() {
 	}
 }
 
-func receiveLoop(ws *websocket.Conn) {
-	log.Printf("[hopwatch] begin accepting commands...\n")
+func connectHandler(ws *websocket.Conn) {
+	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
 	currentWebsocket = ws
+	var cmd command
+	if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
+		log.Printf("[hopwatch] JSON.Receive failed:%v", err)
+	} else {
+		log.Printf("[hopwatch] connected to browser. ready to hop")
+		connectChannel <- cmd
+		receiveLoop()
+	}
+	log.Printf("[hopwatch] stop accepting commands.\n")
+}
+
+func receiveLoop() {
 	for {
-		var cmd Command
+		var cmd command
 		if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
-			log.Print("[hopwatch] JSON.Receive failed")
+			log.Printf("[hopwatch] JSON.Receive failed:%v", err)
 			break
 		}
 		fromBrowserChannel <- cmd
 	}
-	log.Printf("[hopwatch] stop accepting commands.\n")
 }
 
 func sendLoop() {
@@ -60,20 +72,21 @@ func sendLoop() {
 		}
 		if currentWebsocket == nil {
 			log.Print("[hopwatch] no browser connection, wait for it ...")
-			_ = <-fromBrowserChannel
-		} else {
-			websocket.JSON.Send(currentWebsocket, &next)
+			cmd := <-connectChannel
+			if cmd.Action == "quit" {
+				break
+			}
 		}
+		websocket.JSON.Send(currentWebsocket, &next)
 	}
 }
 
 // Break stops the execution of the program and passes values to the Hopwatch page to show.
 // The execution of the program is resumed after receiving the proceed command. 
 func Break(location string, key string, value interface{}) {
-	cmd := Command{Action: "watch"}
+	cmd := command{Action: "watch"}
 	cmd.addParam("go.location", location)
 	cmd.addParam(key, fmt.Sprint(value))
-
 	toBrowserChannel <- cmd
 	cmd = <-fromBrowserChannel
 }

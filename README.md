@@ -18,8 +18,7 @@ On the hopwatch page, the developer can view debug information and choose to pro
 	}
 
 ###Tool
-Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.
-
+Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.  
 Your browser must support WebSockets ; it has been tested with Chrome.
 
 ###Resources
