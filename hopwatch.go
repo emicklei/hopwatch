@@ -48,6 +48,7 @@ func init() {
 	go listen()
 	go sendLoop()
 }
+
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
 func listen() {
@@ -56,6 +57,7 @@ func listen() {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
 }
+
 // connectHandler is a Http handler and is called on loading the debugger in a browser.
 // As soon as a command is received the receiveLoop is started. 
 func connectHandler(ws *websocket.Conn) {
@@ -84,6 +86,7 @@ func receiveLoop() {
 		fromBrowserChannel <- cmd
 	}
 }
+
 // sendLoop takes commands from a channel to send to the browser (debugger).
 // If no connection is available then wait for it.
 // If the command action is quit then abort the loop.
@@ -106,9 +109,10 @@ func sendLoop() {
 
 // watchpoint is the object that collects information to watch to in the debugger.
 type watchpoint struct {
-	file string
-	line string
-	vars map[string]string
+	file    string
+	line    string
+	vars    map[string]string
+	enabled bool // if false than ignore and other Watches and Break
 }
 
 // Watch will add a variable and its value to the list of variables to watch next in the debugger
@@ -130,6 +134,13 @@ func Watch(variableName string, value interface{}) *watchpoint {
 func (self *watchpoint) Watch(variableName string, value interface{}) *watchpoint {
 	self.vars[variableName] = fmt.Sprint(value)
 	return self
+}
+
+// BreakIf is a conditional Break
+func (self *watchpoint) BreakIf(condition bool) {
+	if condition {
+		self.Break()
+	}
 }
 
 // Break stops the execution of the program and passes the current watchpoint to the Hopwatch page to show.

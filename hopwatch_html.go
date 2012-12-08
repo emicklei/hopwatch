@@ -39,12 +39,24 @@ func writePage(w http.ResponseWriter, req *http.Request) {
             return;
         }		
         console.log("[hopwatch] received: " + evt.data);
-		writeToScreen(evt.data,"watch");		
+        actionWatch(cmd)				
 	}
 	function onError(evt) {
 		writeToScreen(evt,"err");
 	}	
-	function writeToScreen(message,cls) {
+	function actionWatch(cmd) {
+		var tr = document.createElement("tr");
+		var stamp = document.createElement("td");
+		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+		stamp.className = "time"
+		tr.appendChild(stamp);		
+		var td = document.createElement("td");
+		td.className = "watch"		
+		td.innerHTML = watchParametersToHtml(cmd.Parameters);
+		tr.appendChild(td);
+		output.appendChild(tr);
+	}
+	function writeToScreen(text,cls) {
 		var tr = document.createElement("tr");
 		var stamp = document.createElement("td");
 		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
@@ -52,10 +64,21 @@ func writePage(w http.ResponseWriter, req *http.Request) {
 		tr.appendChild(stamp);		
 		var td = document.createElement("td");
 		td.className = cls		
-		td.innerHTML = message;
+		td.innerHTML = text;
 		tr.appendChild(td);
 		output.appendChild(tr);
-	}	
+	}
+	function watchParametersToHtml(parameters) {
+		var f = parameters["go.file"]
+		f = f.substr(f.lastIndexOf("/")+1)
+		var line = f + ":" + parameters["go.line"] + " ";
+		for (var prop in parameters) {
+			if (prop.slice(0,3) != "go.") {
+				line = line + prop + "=" + parameters[prop] + ","
+			}
+		} 
+		return line
+	}
 	function sendConnected() { doSend('{"Action":"connected"}'); }
 	function sendProceed()   { doSend('{"Action":"proceed"}'); }
 	function sendQuit()      { doSend('{"Action":"quit"}'); }	
@@ -76,7 +99,10 @@ func writePage(w http.ResponseWriter, req *http.Request) {
 </head>
 <body>
 	<h2>Hopwatch Debugger</h2>
-	<p><a href="javascript:sendProceed();">[ Proceed ]</a><a href="javascript:sendQuit();">[ Quit ]</a></p>
+	<p>
+		<a href="javascript:sendProceed();">[ Resume ]</a>
+		<!-- a href="javascript:sendQuit();">[ Disconnect ]</a -->				
+	</p>
 	<table id="output" style="width:100%"></table>
 	<h7><a href="https://github.com/emicklei/hopwatch">hopwatch on github</a></h7>
 </body>
