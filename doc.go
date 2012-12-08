@@ -14,8 +14,8 @@ Usage:
 
 	func foo() {
 		bar := "john"
-		// stops execution until hitting "proceed" in the browser
-		hopwatch.Break("foo", "bar", bar)
+		// stops execution until hitting "Resume" in the browser
+		hopwatch.Watch("foo", bar).Break()
 	}
 
 Tool:
