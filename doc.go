@@ -1,5 +1,4 @@
-/*
-Hopwatch, a debugging tool for Go
+/* Hopwatch, a debugging tool for Go
 
 Hopwatch is an experimental tool in HTML5 that can help debugging Go programs. 
 It works by communicating to a WebSockets based agent in Javascript.

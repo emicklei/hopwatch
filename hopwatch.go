@@ -1,8 +1,4 @@
 // hopwatch is a browser-based tool for debugging Go programs.
-
-// Copyright 2012 Ernest Micklei. All rights reserved.
-// Use of this source code is governed by a license 
-// that can be found in the LICENSE file.
 package hopwatch
 
 import (
@@ -107,9 +103,12 @@ func sendLoop() {
 	}
 }
 
-// Watchpoint is a helper to provide A fluent style api
+// Watchpoint is a helper to provide a fluent style api.
+// This allows for statements like hopwatch.Display("var",value).Break()
 type Watchpoint struct{}
 
+// Display sends variable name,value pairs to the debugger.
+// The parameter nameValuePairs must be even sized.
 func Display(nameValuePairs ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(1)
 	cmd := command{Action: "display"}
@@ -126,10 +125,14 @@ func Display(nameValuePairs ...interface{}) *Watchpoint {
 	return new(Watchpoint)
 }
 
+// Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
+// Break is only effective if all (if any) conditions are true. The program will resume otherwise.
 func (self Watchpoint) Break(conditions ...bool) {
 	Break(conditions...)
 }
 
+// Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
+// Break is only effective if all (if any) conditions are true. The program will resume otherwise.
 func Break(conditions ...bool) {
 	for _, condition := range conditions {
 		if !condition {
