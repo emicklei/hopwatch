@@ -1,4 +1,3 @@
-// hopwatch is a browser-based tool for debugging Go programs.
 package hopwatch
 
 import (
@@ -39,7 +38,9 @@ func init() {
 			return
 		}
 	}
-	http.HandleFunc("/hopwatch.html", writePage)
+	http.HandleFunc("/hopwatch.html", html)
+	http.HandleFunc("/hopwatch.css", css)
+	http.HandleFunc("/hopwatch.js", js)
 	http.Handle("/hopwatch", websocket.Handler(connectHandler))
 	go listen()
 	go sendLoop()
@@ -58,6 +59,11 @@ func listen() {
 // As soon as a command is received the receiveLoop is started. 
 func connectHandler(ws *websocket.Conn) {
 	log.Printf("[hopwatch] begin accepting commands ...\n")
+	if currentWebsocket != nil {
+		// reloading an already connected page ; close the old
+		currentWebsocket.Close()
+		// TODO break receiveLoop
+	}
 	// remember the connection for the sendLoop	
 	currentWebsocket = ws
 	var cmd command
@@ -148,6 +154,7 @@ func Break(conditions ...bool) {
 	channelExchangeCommands(cmd)
 }
 
+// Put a command on the browser channel and wait for the reply command
 func channelExchangeCommands(cmd command) {
 	if !hopwatchEnabled {
 		log.Printf("[hopwatch] %v", cmd)

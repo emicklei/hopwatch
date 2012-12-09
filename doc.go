@@ -1,6 +1,6 @@
-/* Hopwatch, a debugging tool for Go
+/*
+Hopwatch is an experimental HTML5 application and Go package that can help debugging Go programs. 
 
-Hopwatch is an experimental tool in HTML5 that can help debugging Go programs. 
 It works by communicating to a WebSockets based agent in Javascript.
 When your program calls the Break function, it sends debug information to the browser page and waits for user interaction.
 On the hopwatch page, the developer can view debug information and choose to proceed or terminate the execution of your program.
