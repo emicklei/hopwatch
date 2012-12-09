@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"runtime/debug"
 )
 
 // command is used to transport message to and from the debugger.
@@ -145,11 +146,12 @@ func Break(conditions ...bool) {
 			return
 		}
 	}
-	_, file, line, ok := runtime.Caller(1)
+	_, file, line, ok := runtime.Caller(2)
 	cmd := command{Action: "break"}
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
+		cmd.addParam("go.stack", string(debug.Stack()))
 	}
 	channelExchangeCommands(cmd)
 }

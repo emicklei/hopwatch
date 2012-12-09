@@ -37,51 +37,57 @@ func js(w http.ResponseWriter, req *http.Request) {
         }		
         console.log("[hopwatch] received: " + evt.data);
         if (cmd.Action == "display") {
-        	actionDisplay(cmd);
+        	row(timeHHMMSS(), goline(cmd.Parameters), "", watchParametersToHtml(cmd.Parameters), "watch")
         	sendResume();
         }
         if (cmd.Action == "break") {
-        	writeToScreen("break","info")        	
+        	row(timeHHMMSS(), goline(cmd.Parameters), "", " program suspended", "suspend")
         }				        				
 	}
 	function onError(evt) {
 		writeToScreen(evt,"err");
-	}	
-	function actionDisplay(cmd) {
+	}
+	function row(time,goline,stack,msg,msgcls) {
 		var tr = document.createElement("tr");
+		
 		var stamp = document.createElement("td");
-		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+		stamp.innerHTML = time;
 		stamp.className = "time"
-		tr.appendChild(stamp);		
-		var td = document.createElement("td");
-		td.className = "watch"		
-		td.innerHTML = watchParametersToHtml(cmd.Parameters);
-		tr.appendChild(td);
-		output.appendChild(tr);
+		tr.appendChild(stamp);	
+			
+		var where = document.createElement("td");
+		where.className = "goline"		
+		where.innerHTML = goline;
+		tr.appendChild(where);	
+
+		var txt = document.createElement("td");
+		txt.className = msgcls		
+		txt.innerHTML = msg;
+		tr.appendChild(txt);
+		
+		output.appendChild(tr);		
 	}
 	function writeToScreen(text,cls) {
-		var tr = document.createElement("tr");
-		var stamp = document.createElement("td");
-		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
-		stamp.className = "time"
-		tr.appendChild(stamp);		
-		var td = document.createElement("td");
-		td.className = cls		
-		td.innerHTML = text;
-		tr.appendChild(td);
-		output.appendChild(tr);
+		row(timeHHMMSS(), "", "", text ,cls)
 	}
 	function watchParametersToHtml(parameters) {
-		var f = parameters["go.file"]
-		f = f.substr(f.lastIndexOf("/")+1)
-		var line = f + ":" + parameters["go.line"] + " ";
+		var line = "";
+		var multiline = false;
 		for (var prop in parameters) {
-			if (prop.slice(0,3) != "go.") {
-				line = line + prop + "=" + parameters[prop] + ","
+			if (prop.slice(0,3) != "go.") {				
+				if (multiline) { line = line + ", "; }
+				line = line + prop + "=" + parameters[prop];
+				multiline = true;
 			}
 		} 
 		return line
 	}
+	function goline(parameters) { 
+		var f = parameters["go.file"]
+		f = f.substr(f.lastIndexOf("/")+1)
+		return f + ":" + parameters["go.line"]
+	}
+	function timeHHMMSS() { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
 	function sendConnected() { doSend('{"Action":"connected"}'); }
 	function sendResume()   { doSend('{"Action":"resume"}'); }
 	function sendQuit()      { doSend('{"Action":"quit"}'); }	
