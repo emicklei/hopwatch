@@ -6,8 +6,7 @@ import (
 
 func main() {
 	for i := 0; i < 6; i++ {
-		hopwatch.Watch("i",i).Break()
 		j := i * i
-		hopwatch.Watch("j",j).BreakIf(j > 10)
+		hopwatch.Display("i",i, "j", j).Break(j > 10)
 	}
 }

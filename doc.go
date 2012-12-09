@@ -15,7 +15,7 @@ Usage:
 	func foo() {
 		bar := "john"
 		// stops execution until hitting "Resume" in the browser
-		hopwatch.Watch("foo", bar).Break()
+		hopwatch.Display("foo", bar).Break()
 	}
 
 Tool:
@@ -26,6 +26,7 @@ Your browser must support WebSockets ; it has been tested with Chrome.
 Resources:
 
 [project]	https://github.com/emicklei/hopwatch
+
 [blog]		http://ernestmicklei.com
 
 (c) 2012, http://ernestmicklei.com. MIT License

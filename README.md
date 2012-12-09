@@ -17,7 +17,7 @@ On the hopwatch page, the developer can view debug information and choose to pro
 	func foo() {
 		bar := "john"
 		// stops execution until hitting "proceed" in the browser
-		hopwatch.Watch("foo", bar).Break()
+		hopwatch.Display("foo", bar).Break()
 	}
 
 ###Tool

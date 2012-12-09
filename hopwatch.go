@@ -107,54 +107,48 @@ func sendLoop() {
 	}
 }
 
-// watchpoint is the object that collects information to watch to in the debugger.
-type watchpoint struct {
-	file    string
-	line    string
-	vars    map[string]string
-	enabled bool // if false than ignore and other Watches and Break
-}
+// Watchpoint is a helper to provide A fluent style api
+type Watchpoint struct{}
 
-// Watch will add a variable and its value to the list of variables to watch next in the debugger
-// It will not be send to the debugger until Break is called on the watchpoint
-func Watch(variableName string, value interface{}) *watchpoint {
-	wp := new(watchpoint)
-	wp.vars = map[string]string{}
+func Display(nameValuePairs ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(1)
+	cmd := command{Action: "display"}
 	if ok {
-		wp.file = file
-		wp.line = fmt.Sprint(line)
+		cmd.addParam("go.file", file)
+		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	wp.vars[variableName] = fmt.Sprint(value)
-	return wp
-}
-
-// Watch will add a variable and its value to the list of variables to watch next in the debugger
-// It will not be send to the debugger until Break is called on the watchpoint
-func (self *watchpoint) Watch(variableName string, value interface{}) *watchpoint {
-	self.vars[variableName] = fmt.Sprint(value)
-	return self
-}
-
-// BreakIf is a conditional Break
-func (self *watchpoint) BreakIf(condition bool) {
-	if condition {
-		self.Break()
+	for i := 0; i < len(nameValuePairs); i += 2 {
+		k := nameValuePairs[i]
+		v := nameValuePairs[i+1]
+		cmd.addParam(fmt.Sprint(k), fmt.Sprint(v))
 	}
+	channelExchangeCommands(cmd)
+	return new(Watchpoint)
 }
 
-// Break stops the execution of the program and passes the current watchpoint to the Hopwatch page to show.
-// The execution of the program is resumed after receiving the proceed command. 
-func (self *watchpoint) Break() {
+func (self Watchpoint) Break(conditions ...bool) {
+	Break(conditions...)
+}
+
+func Break(conditions ...bool) {
+	for _, condition := range conditions {
+		if !condition {
+			return
+		}
+	}
+	_, file, line, ok := runtime.Caller(1)
+	cmd := command{Action: "break"}
+	if ok {
+		cmd.addParam("go.file", file)
+		cmd.addParam("go.line", fmt.Sprint(line))
+	}
+	channelExchangeCommands(cmd)
+}
+
+func channelExchangeCommands(cmd command) {
 	if !hopwatchEnabled {
-		log.Printf("[hopwatch] %v", self)
+		log.Printf("[hopwatch] %v", cmd)
 		return
-	}
-	cmd := command{Action: "watch"}
-	cmd.addParam("go.file", self.file)
-	cmd.addParam("go.line", self.line)
-	for k, v := range self.vars {
-		cmd.addParam(k, v)
 	}
 	toBrowserChannel <- cmd
 	cmd = <-fromBrowserChannel

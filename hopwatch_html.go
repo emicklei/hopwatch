@@ -39,12 +39,18 @@ func writePage(w http.ResponseWriter, req *http.Request) {
             return;
         }		
         console.log("[hopwatch] received: " + evt.data);
-        actionWatch(cmd)				
+        if (cmd.Action == "display") {
+        	actionDisplay(cmd);
+        	sendProceed();
+        }
+        if (cmd.Action == "break") {
+        	writeToScreen("break","info")        	
+        }				        				
 	}
 	function onError(evt) {
 		writeToScreen(evt,"err");
 	}	
-	function actionWatch(cmd) {
+	function actionDisplay(cmd) {
 		var tr = document.createElement("tr");
 		var stamp = document.createElement("td");
 		stamp.innerHTML = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
