@@ -1,3 +1,7 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 /*
 Hopwatch is an experimental HTML5 application and Go package that can help debugging Go programs. 
 
@@ -17,16 +21,12 @@ Usage:
 		hopwatch.Display("foo", bar).Break()
 	}
 
-Tool:
-
-Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.
+Open the Hopwatch debugger on http://localhost:23456/hopwatch.html after starting your program.
 Your browser must support WebSockets ; it has been tested with Chrome.
 
 Resources:
 
-[project]	https://github.com/emicklei/hopwatch
-
-[blog]		http://ernestmicklei.com
+https://github.com/emicklei/hopwatch
 
 (c) 2012, http://ernestmicklei.com. MIT License
 */

@@ -1,3 +1,7 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package hopwatch
 
 import (
@@ -130,8 +134,20 @@ type Watchpoint struct {
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
 func Display(nameValuePairs ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset:2}
+	wp := &Watchpoint{offset: 2}
 	return wp.Display(nameValuePairs...)
+}
+
+// Caller increases the caller offset to be displayed.
+// The Display and Break information will be displayed for the file of the function that called Caller.
+func Caller() *Watchpoint {
+	return &Watchpoint{offset: 3}
+}
+
+// Break suspends the execution of the program and waits for an instruction from the debugger (e.g. Resume).
+// Break is only effective if all (if any) conditions are true. The program will resume otherwise.
+func Break(conditions ...bool) {
+	suspend(2, conditions...)
 }
 
 // Display sends variable name,value pairs to the debugger.
@@ -176,22 +192,11 @@ func (self Watchpoint) Break(conditions ...bool) {
 	suspend(self.offset, conditions...)
 }
 
-// Increases the caller offset to be displayed.
-// The Display and Break information will be displayed for the file of the function that called Caller.
-func Caller() *Watchpoint {
-	return &Watchpoint{offset: 3}
-}
-// Increases the caller offset to be displayed.
+// Caller increases the caller offset to be displayed.
 // The Display and Break information will be displayed for the file of the function that called Caller.
 func (self *Watchpoint) Caller() *Watchpoint {
 	self.offset += self.offset + 1
 	return self
-}
-
-// Break suspends the execution of the program and waits for an instruction from the debugger (e.g. Resume).
-// Break is only effective if all (if any) conditions are true. The program will resume otherwise.
-func Break(conditions ...bool) {
-	suspend(2,conditions...)
 }
 
 // suspend will create a new Command and send it to the browser.

@@ -1,21 +1,21 @@
 package hopwatch
 
 import (
-    "testing"
-    "log"
+	"log"
+	"testing"
 )
 
 func TestWatchpoint_Caller(t *testing.T) {
 	go shortCircuit(commandResume())
-	Caller().Break()	
+	Caller().Break()
 }
 
 func commandResume() command {
-	return command{Action:"resume"}
+	return command{Action: "resume"}
 }
 
 func shortCircuit(next command) {
-	cmd := <- toBrowserChannel
+	cmd := <-toBrowserChannel
 	log.Printf("send to browser:%#v\n", cmd)
 	log.Printf("received from browser:%#v\n", next)
 	fromBrowserChannel <- next
