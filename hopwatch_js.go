@@ -72,9 +72,9 @@ func js(w http.ResponseWriter, req *http.Request) {
 	}
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {
-		console.log(event.keyCode);
-		if (event.keyCode == 199) {
+		if (event.keyCode == 119) {
 			sendResume();
+			writeToScreen("program resumed","info");  // Really should ask Go for this status
 		}
 	}
 	function watchParametersToHtml(parameters) {
@@ -103,6 +103,6 @@ func js(w http.ResponseWriter, req *http.Request) {
 		websocket.send(message);
 	}
 	window.addEventListener("load", init, false);
-	window.addEventListener("keydown", handleKeyDown, false); `)
+	window.addEventListener("keydown", handleKeyDown, true); `)
 	return
 }

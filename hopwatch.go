@@ -2,6 +2,7 @@ package hopwatch
 
 import (
 	"code.google.com/p/go.net/websocket"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,6 +25,7 @@ func (self *command) addParam(key, value string) {
 	self.Parameters[key] = value
 }
 
+var hopwatchParam = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
 var hopwatchEnabled = true
 var currentWebsocket *websocket.Conn
 var toBrowserChannel = make(chan command)
@@ -32,8 +34,8 @@ var connectChannel = make(chan command)
 
 func init() {
 	// see if disable is needed
-	for _, arg := range os.Args {
-		if arg == "-nobreak" {
+	for i, arg := range os.Args {
+		if arg == "-hopwatch" && i < len(os.Args) && os.Args[i+1] == "false" {
 			log.Printf("[hopwatch] disabled.\n")
 			hopwatchEnabled = false
 			return
@@ -59,12 +61,13 @@ func listen() {
 // connectHandler is a Http handler and is called on loading the debugger in a browser.
 // As soon as a command is received the receiveLoop is started. 
 func connectHandler(ws *websocket.Conn) {
-	log.Printf("[hopwatch] begin accepting commands ...\n")
 	if currentWebsocket != nil {
-		// reloading an already connected page ; close the old
+		// reloading an already connected page ; close the old		
 		currentWebsocket.Close()
+		log.Printf("[hopwatch] closed old connection.\n")
 		// TODO break receiveLoop
 	}
+	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
 	currentWebsocket = ws
 	var cmd command
@@ -94,6 +97,13 @@ func receiveLoop() {
 // If no connection is available then wait for it.
 // If the command action is quit then abort the loop.
 func sendLoop() {
+	if currentWebsocket == nil {
+		log.Print("[hopwatch] no browser connection, wait for it ...")
+		cmd := <-connectChannel
+		if cmd.Action == "quit" {
+			return
+		}
+	}
 	for {
 		next := <-toBrowserChannel
 		if next.Action == "quit" {
@@ -140,13 +150,16 @@ func Display(nameValuePairs ...interface{}) *Watchpoint {
 	return &Watchpoint{offset: 2}
 }
 
-// StackOffset (default=2) allows you to change the file indicator in hopwatch.
-// Use this method when you wrap the Display(..).Break() in your own function.
-func (self *Watchpoint) StackOffset(offset int) *Watchpoint {
+// CallerOffset (default=2 and must be positive) allows you to change the file indicator in hopwatch.
+// Use this method when you wrap the Display(..).CallerOffset(2+1).Break() in your own function.
+func (self *Watchpoint) CallerOffset(offset int) *Watchpoint {
+	if self.disabled {
+		return self
+	}
 	if offset > 0 {
 		self.offset = offset
 	} else {
-		log.Printf("[hopwatch] WARN: illegal stack (caller) offset:%v . Watchpoint is disabled.", offset)
+		log.Printf("[hopwatch] WARN: illegal caller offset:%v . Watchpoint is disabled.\n", offset)
 		self.disabled = true
 	}
 	return self
@@ -155,15 +168,17 @@ func (self *Watchpoint) StackOffset(offset int) *Watchpoint {
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
 func (self Watchpoint) Break(conditions ...bool) {
-	if self.disabled {
-		return
-	}
 	Break(self.offset, conditions...)
 }
 
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
+// callerOffset controls from which stackframe the go source file and linenumber must be read. For direct use of this function, set the offset to 1.
 func Break(callerOffset int, conditions ...bool) {
+	if callerOffset < 0 {
+		log.Printf("[hopwatch] WARN: illegal caller offset:%v . Break is ineffective.\n", callerOffset)
+		return
+	}
 	for _, condition := range conditions {
 		if !condition {
 			return
@@ -180,11 +195,13 @@ func Break(callerOffset int, conditions ...bool) {
 }
 
 // Put a command on the browser channel and wait for the reply command
-func channelExchangeCommands(cmd command) {
+func channelExchangeCommands(toCmd command) {
 	if !hopwatchEnabled {
-		log.Printf("[hopwatch] %v", cmd)
 		return
 	}
-	toBrowserChannel <- cmd
-	cmd = <-fromBrowserChannel
+	toBrowserChannel <- toCmd
+	_ = <-fromBrowserChannel
+	//	if fromCmd == "resume" {
+	//		channelExchangeCommands(Command{Action:"status"}
+	//	}
 }
