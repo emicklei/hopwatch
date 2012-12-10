@@ -73,11 +73,11 @@ func css(w http.ResponseWriter, req *http.Request) {
 		margin: 40px 0;
 	}		
 		
-	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;white-space:nowrap}
+	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#AAA;white-space:nowrap}
 	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
-	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;}
+	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;width:100%;}
-	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;width:100%;}
-	.suspend {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;}`)
+	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
+	.suspend {font-family:"Lucida Console", Monaco, monospace;font-size:small;}`)
 	return
 }

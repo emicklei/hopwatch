@@ -130,7 +130,14 @@ type Watchpoint struct {
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
 func Display(nameValuePairs ...interface{}) *Watchpoint {
-	_, file, line, ok := runtime.Caller(1)
+	wp := &Watchpoint{offset:2}
+	return wp.Display(nameValuePairs...)
+}
+
+// Display sends variable name,value pairs to the debugger.
+// The parameter nameValuePairs must be even sized.
+func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
+	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "display"}
 	if ok {
 		cmd.addParam("go.file", file)
@@ -144,18 +151,16 @@ func Display(nameValuePairs ...interface{}) *Watchpoint {
 		}
 	} else {
 		log.Printf("[hopwatch] WARN: missing variable for Display(...) in: %v:%v\n", file, line)
-		return &Watchpoint{disabled: true, offset: 2}
+		self.disabled = true
+		return self
 	}
 	channelExchangeCommands(cmd)
-	return &Watchpoint{offset: 2}
+	return self
 }
 
 // CallerOffset (default=2 and must be positive) allows you to change the file indicator in hopwatch.
 // Use this method when you wrap the Display(..).CallerOffset(2+1).Break() in your own function.
 func (self *Watchpoint) CallerOffset(offset int) *Watchpoint {
-	if self.disabled {
-		return self
-	}
 	if offset > 0 {
 		self.offset = offset
 	} else {
@@ -168,17 +173,30 @@ func (self *Watchpoint) CallerOffset(offset int) *Watchpoint {
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
 func (self Watchpoint) Break(conditions ...bool) {
-	Break(self.offset, conditions...)
+	suspend(self.offset, conditions...)
 }
 
-// Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
+// Increases the caller offset to be displayed.
+// The Display and Break information will be displayed for the file of the function that called Caller.
+func Caller() *Watchpoint {
+	return &Watchpoint{offset: 3}
+}
+// Increases the caller offset to be displayed.
+// The Display and Break information will be displayed for the file of the function that called Caller.
+func (self *Watchpoint) Caller() *Watchpoint {
+	self.offset += self.offset + 1
+	return self
+}
+
+// Break suspends the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
-// callerOffset controls from which stackframe the go source file and linenumber must be read. For direct use of this function, set the offset to 1.
-func Break(callerOffset int, conditions ...bool) {
-	if callerOffset < 0 {
-		log.Printf("[hopwatch] WARN: illegal caller offset:%v . Break is ineffective.\n", callerOffset)
-		return
-	}
+func Break(conditions ...bool) {
+	suspend(2,conditions...)
+}
+
+// suspend will create a new Command and send it to the browser.
+// callerOffset controls from which stackframe the go source file and linenumber must be read.
+func suspend(callerOffset int, conditions ...bool) {
 	for _, condition := range conditions {
 		if !condition {
 			return

@@ -18,7 +18,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 	<div id="topbar">
 		<div class="container wide">
 			<div id="heading">
-				<a href="/hopwatch.html">Hopwatch - debugger</a>
+				<a href="/hopwatch.html">Hopwatch - debugging tool</a>
 			</div>		
 			<div id="menu">
 				<a href="javascript:sendResume();">F8 - Resume</a>

@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	hopwatch.Break(1)
+	hopwatch.Break()
 }
