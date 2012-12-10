@@ -13,13 +13,13 @@ Usage:
 
 	func foo() {
 		bar := "john"
-		// stops execution until hitting "Resume" in the browser
+		// suspends execution until hitting "Resume" in the browser
 		hopwatch.Display("foo", bar).Break()
 	}
 
 Tool:
 
-Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.
+Open the Hopwatch debugger on http://localhost:23456.
 Your browser must support WebSockets ; it has been tested with Chrome.
 
 Resources:

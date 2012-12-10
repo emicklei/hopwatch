@@ -39,7 +39,7 @@ func init() {
 			return
 		}
 	}
-	http.HandleFunc("/hopwatch.html", html)
+	http.HandleFunc("/", html)
 	http.HandleFunc("/hopwatch.css", css)
 	http.HandleFunc("/hopwatch.js", js)
 	http.Handle("/hopwatch", websocket.Handler(connectHandler))
@@ -50,7 +50,7 @@ func init() {
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
 func listen() {
-	log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
+	log.Printf("[hopwatch] open http://localhost:23456 ...\n")
 	if err := http.ListenAndServe(":23456", nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}

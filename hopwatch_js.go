@@ -70,6 +70,13 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function writeToScreen(text,cls) {
 		row(timeHHMMSS(), "", "", text ,cls)
 	}
+	// http://www.quirksmode.org/js/keys.html
+	function handleKeyDown(event) {
+		console.log(event.keyCode);
+		if (event.keyCode == 199) {
+			sendResume();
+		}
+	}
 	function watchParametersToHtml(parameters) {
 		var line = "";
 		var multiline = false;
@@ -95,6 +102,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		console.log("[hopwatch] send: " + message);
 		websocket.send(message);
 	}
-	window.addEventListener("load", init, false);`)
+	window.addEventListener("load", init, false);
+	window.addEventListeners("keydown", handleKeyDown, false); `)
 	return
 }

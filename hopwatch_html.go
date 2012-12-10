@@ -15,12 +15,24 @@ func html(w http.ResponseWriter, req *http.Request) {
 	<script type="text/javascript" src="hopwatch.js" ></script>
 </head>
 <body>
-	<h2>Hopwatch Go Debugger</h2>
-	<p>
-		<a href="javascript:sendResume();">[ Resume ]</a>
-		<!-- a href="javascript:sendQuit();">[ Disconnect ]</a -->				
-	</p>
-	<table id="output" style="width:100%"></table>
+	<div id="topbar">
+		<div class="container wide">
+			<div id="heading">
+				<a href="/hopwatch.html">Hopwatch - debugger</a>
+			</div>		
+			<div id="menu">
+				<a href="javascript:sendResume();">Resume</a> <!-- map to F8 -->
+				<a href="javascript:sendQuit();">Disconnect</a>
+				<a href="http://go.pkgdoc.org/github.com/emicklei/hopwatch">About</a>
+			</div>
+		</div>
+	</div>
+	<div id="page" class="wide">
+		<table id="output" style="width:100%"></table>
+	</div>
+	<div id="footer">
+		<a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
+	</div>
 </body>
 </html>
 `)

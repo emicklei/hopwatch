@@ -8,12 +8,76 @@ import (
 func css(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/css")
 	io.WriteString(w, `
-	.time    {background-color:#DDD;font-family:"Lucida Console", Monaco, monospace;font-size:small;white-space:nowrap}
-	.watch 	 {background-color:#FFF;font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
-	.goline  {background-color:#FFF;color:#888;font-family:"Lucida Console", Monaco, monospace;font-size:small;}
-	.err 	 {background-color:#FF3300;}
-	.info 	 {background-color:#CCFFCC;}
-	.suspend {background-color:#E0EBF5;}
-	body 	 {background-color:#EEE;}`)
+	body {
+		margin: 0;
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 16px;
+		color: #222;
+	}
+	a { text-decoration:none; color: #375EAB; }
+	div#heading {
+		float: left;
+		margin: 0 0 10px 0;
+		padding: 21px 0;
+		font-size: 20px;
+		font-weight: normal;
+	}
+	div#heading a {
+		color: #222;
+		text-decoration: none;
+	}	
+	div#topbar {
+		background: #E0EBF5;
+		height: 64px;
+	}
+	div#page,
+	div#topbar > .container {
+		clear: both;
+		text-align: left;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 0 20px;
+		width: 900px;
+	}
+	div#page,
+	div#topbar > .wide {
+		width: auto;
+	}	
+	div#menu {
+		float: left;
+		min-width: 590px;
+		padding: 10px 0;
+		text-align: right;
+		margin-top: 10px;
+	}
+	div#menu > a {
+		margin-right: 5px;
+		margin-bottom: 10px;
+		padding: 10px;
+		color: white;
+		background: #375EAB;				
+	}
+	div#menu > a,
+	div#menu > input {
+		padding: 10px;	
+		text-decoration: none;
+		font-size: 16px;	
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+	div#footer {
+		text-align: center;
+		color: #666;
+		font-size: 14px;
+		margin: 40px 0;
+	}		
+		
+	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;white-space:nowrap}
+	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
+	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;}
+	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;}
+	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;}
+	.suspend {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;}`)
 	return
 }
