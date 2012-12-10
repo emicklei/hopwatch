@@ -68,7 +68,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		output.appendChild(tr);		
 	}
 	function writeToScreen(text,cls) {
-		row(timeHHMMSS(), "", "", text ,cls)
+		row(timeHHMMSS(), "hopwatch", "", text ,cls)
 	}
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {
@@ -103,6 +103,6 @@ func js(w http.ResponseWriter, req *http.Request) {
 		websocket.send(message);
 	}
 	window.addEventListener("load", init, false);
-	window.addEventListeners("keydown", handleKeyDown, false); `)
+	window.addEventListener("keydown", handleKeyDown, false); `)
 	return
 }

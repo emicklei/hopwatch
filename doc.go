@@ -19,7 +19,7 @@ Usage:
 
 Tool:
 
-Open the Hopwatch debugger on http://localhost:23456.
+Open the Hopwatch debugger on http://localhost:23456/hopwatch.html.
 Your browser must support WebSockets ; it has been tested with Chrome.
 
 Resources:

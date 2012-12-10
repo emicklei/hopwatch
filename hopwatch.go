@@ -39,7 +39,7 @@ func init() {
 			return
 		}
 	}
-	http.HandleFunc("/", html)
+	http.HandleFunc("/hopwatch.html", html)
 	http.HandleFunc("/hopwatch.css", css)
 	http.HandleFunc("/hopwatch.js", js)
 	http.Handle("/hopwatch", websocket.Handler(connectHandler))
@@ -50,7 +50,7 @@ func init() {
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
 func listen() {
-	log.Printf("[hopwatch] open http://localhost:23456 ...\n")
+	log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
 	if err := http.ListenAndServe(":23456", nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
@@ -112,7 +112,10 @@ func sendLoop() {
 
 // Watchpoint is a helper to provide a fluent style api.
 // This allows for statements like hopwatch.Display("var",value).Break()
-type Watchpoint struct{}
+type Watchpoint struct {
+	disabled bool
+	offset   int
+}
 
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
@@ -123,30 +126,50 @@ func Display(nameValuePairs ...interface{}) *Watchpoint {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	for i := 0; i < len(nameValuePairs); i += 2 {
-		k := nameValuePairs[i]
-		v := nameValuePairs[i+1]
-		cmd.addParam(fmt.Sprint(k), fmt.Sprint(v))
+	if len(nameValuePairs)%2 == 0 {
+		for i := 0; i < len(nameValuePairs); i += 2 {
+			k := nameValuePairs[i]
+			v := nameValuePairs[i+1]
+			cmd.addParam(fmt.Sprint(k), fmt.Sprint(v))
+		}
+	} else {
+		log.Printf("[hopwatch] WARN: missing variable for Display(...) in: %v:%v\n", file, line)
+		return &Watchpoint{disabled: true, offset: 2}
 	}
 	channelExchangeCommands(cmd)
-	return new(Watchpoint)
+	return &Watchpoint{offset: 2}
+}
+
+// StackOffset (default=2) allows you to change the file indicator in hopwatch.
+// Use this method when you wrap the Display(..).Break() in your own function.
+func (self *Watchpoint) StackOffset(offset int) *Watchpoint {
+	if offset > 0 {
+		self.offset = offset
+	} else {
+		log.Printf("[hopwatch] WARN: illegal stack (caller) offset:%v . Watchpoint is disabled.", offset)
+		self.disabled = true
+	}
+	return self
 }
 
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
 func (self Watchpoint) Break(conditions ...bool) {
-	Break(conditions...)
+	if self.disabled {
+		return
+	}
+	Break(self.offset, conditions...)
 }
 
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
-func Break(conditions ...bool) {
+func Break(callerOffset int, conditions ...bool) {
 	for _, condition := range conditions {
 		if !condition {
 			return
 		}
 	}
-	_, file, line, ok := runtime.Caller(2)
+	_, file, line, ok := runtime.Caller(callerOffset)
 	cmd := command{Action: "break"}
 	if ok {
 		cmd.addParam("go.file", file)

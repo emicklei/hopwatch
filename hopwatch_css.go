@@ -76,8 +76,8 @@ func css(w http.ResponseWriter, req *http.Request) {
 	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;white-space:nowrap}
 	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
 	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;}
-	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;}
-	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;}
+	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;width:100%;}
+	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;width:100%;}
 	.suspend {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#E0EBF5;}`)
 	return
 }
