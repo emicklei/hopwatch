@@ -28,18 +28,18 @@ Connect:
 
 Other examples:
 
-	hopwatch.Break(i > 10,  j < 100)	// zero or more conditions
-										// suspends program (or goroutine)
-	hopwatch.Display("i",i , "j",j")	// zero or more name,value pairs
-										// no program suspend
-	hopwatch.Caller().Display("a",a)	// fixes the caller offset when called 
-										// inside a wrapper function
+	// zero or more conditions ; suspends program (or goroutine)
+	hopwatch.Break(i > 10,  j < 100)	
+
+	// zero or more name,value pairs ; no program suspend
+	hopwatch.Display("i",i , "j",j")	
+
+	// fixes the caller offset when the hopwatch statement is called inside your own wrapper function
+	hopwatch.Caller().Display("a",a)
 
 The flags are:
 
-	-hopwatch							if present and set to false 
-										then hopwatch is disabled 
-										and will not connect to the debugger.
+	-hopwatch	if present and set to false then hopwatch is disabled and will not connect to the debugger.
 
 Install:
 
@@ -49,8 +49,9 @@ Install:
 Resources:
 
 	https://github.com/emicklei/hopwatch
+	http://ernestmicklei.com  (blog)
 
 
-(c) 2012, http://ernestmicklei.com. MIT License
+(c) 2012, Ernest Micklei. MIT License
 */
 package hopwatch

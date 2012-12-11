@@ -13,6 +13,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"sync"
 )
 
 // command is used to transport message to and from the debugger.
@@ -35,6 +36,7 @@ var currentWebsocket *websocket.Conn
 var toBrowserChannel = make(chan command)
 var fromBrowserChannel = make(chan command)
 var connectChannel = make(chan command)
+var debuggerMutex = sync.Mutex{}
 
 func init() {
 	// see if disable is needed
@@ -184,6 +186,7 @@ func (self *watchpoint) Display(nameValuePairs ...interface{}) *watchpoint {
 
 // CallerOffset (default=2 and must be positive) allows you to change the file indicator in hopwatch.
 // Use this method when you wrap the Display(..).CallerOffset(2+1).Break() in your own function.
+// I suspect this is rarely needed.
 func (self *watchpoint) CallerOffset(offset int) *watchpoint {
 	if offset > 0 {
 		self.offset = offset
@@ -202,6 +205,7 @@ func (self watchpoint) Break(conditions ...bool) {
 
 // Caller increases the caller offset to be displayed.
 // The Display and Break information will be displayed for the file of the function that called Caller.
+// I suspect this is rarely needed.
 func (self *watchpoint) Caller() *watchpoint {
 	self.offset += self.offset + 1
 	return self
@@ -230,8 +234,11 @@ func channelExchangeCommands(toCmd command) {
 	if !hopwatchEnabled {
 		return
 	}
+	// synchronize this
+	debuggerMutex.Lock()	
 	toBrowserChannel <- toCmd
 	_ = <-fromBrowserChannel
+	debuggerMutex.Unlock()
 	//	if fromCmd == "resume" {
 	//		channelExchangeCommands(Command{Action:"status"}
 	//	}
