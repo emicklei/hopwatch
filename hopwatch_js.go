@@ -48,7 +48,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         	sendResume();
         }
         if (cmd.Action == "break") {
-        	handleSuspended();
+        	handleSuspended(cmd);
         }				        				
 	}
 	function onError(evt) {
@@ -101,7 +101,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		f = f.substr(f.lastIndexOf("/")+1)
 		return f + ":" + parameters["go.line"]
 	}
-	function handleSuspended() {
+	function handleSuspended(cmd) {
         suspended = true;
         document.getElementById("resume").className = "buttonEnabled";
         row(timeHHMMSS(), goline(cmd.Parameters), "", " program suspended", "suspend")	

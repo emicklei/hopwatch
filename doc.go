@@ -24,21 +24,32 @@ Usage:
 Connect:
 
 	Open the Hopwatch debugger on http://localhost:23456/hopwatch.html after starting your program.
-	Your browser must support WebSockets ; it has been tested with Chrome.
+	Your browser must support WebSockets.
 
 Other examples:
 
-	hopwatch.Break(i > 10,  j < 100)	// zero or more conditions ; suspends program (or goroutine)
-	hopwatch.Display("i",i , "j",j")	// zero or more name,value pairs ; no program suspend
-	hopwatch.Caller().Display("a",a)	// fixes the caller offset when called inside a wrapper function
+	hopwatch.Break(i > 10,  j < 100)	// zero or more conditions
+										// suspends program (or goroutine)
+	hopwatch.Display("i",i , "j",j")	// zero or more name,value pairs
+										// no program suspend
+	hopwatch.Caller().Display("a",a)	// fixes the caller offset when called 
+										// inside a wrapper function
 
 The flags are:
 
-	-hopwatch	if present and set to false then hopwatch is disabled and will not connect to the debugger.
+	-hopwatch							if present and set to false 
+										then hopwatch is disabled 
+										and will not connect to the debugger.
+
+Install:
+
+	go get github.com/emicklei/hopwatch
+
 
 Resources:
 
 	https://github.com/emicklei/hopwatch
+
 
 (c) 2012, http://ernestmicklei.com. MIT License
 */

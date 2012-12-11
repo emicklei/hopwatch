@@ -67,7 +67,7 @@ func listen() {
 func connectHandler(ws *websocket.Conn) {
 	if currentWebsocket != nil {
 		// reloading an already connected page ; close the old		
-		if err := currentWebsocket.Close() ; err != nil {
+		if err := currentWebsocket.Close(); err != nil {
 			log.Printf("[hopwatch] unable to close old connection\n")
 		} else {
 			log.Printf("[hopwatch] closed old connection\n")
