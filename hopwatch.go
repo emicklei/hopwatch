@@ -67,9 +67,14 @@ func listen() {
 func connectHandler(ws *websocket.Conn) {
 	if currentWebsocket != nil {
 		// reloading an already connected page ; close the old		
-		currentWebsocket.Close()
-		log.Printf("[hopwatch] closed old connection.\n")
-		// TODO break receiveLoop
+		if err := currentWebsocket.Close() ; err != nil {
+			log.Printf("[hopwatch] unable to close old connection\n")
+		} else {
+			log.Printf("[hopwatch] closed old connection\n")
+		}
+		log.Printf("[hopwatch] resume accepting commands ...\n")
+		currentWebsocket = ws
+		return
 	}
 	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
@@ -93,6 +98,9 @@ func receiveLoop() {
 			log.Printf("[hopwatch] JSON.Receive failed:%v", err)
 			break
 		}
+		if "quit" == cmd.Action {
+			break
+		}
 		fromBrowserChannel <- cmd
 	}
 }
@@ -104,19 +112,19 @@ func sendLoop() {
 	if currentWebsocket == nil {
 		log.Print("[hopwatch] no browser connection, wait for it ...")
 		cmd := <-connectChannel
-		if cmd.Action == "quit" {
+		if "quit" == cmd.Action {
 			return
 		}
 	}
 	for {
 		next := <-toBrowserChannel
-		if next.Action == "quit" {
+		if "quit" == next.Action {
 			break
 		}
 		if currentWebsocket == nil {
 			log.Print("[hopwatch] no browser connection, wait for it ...")
 			cmd := <-connectChannel
-			if cmd.Action == "quit" {
+			if "quit" == cmd.Action {
 				break
 			}
 		}
@@ -124,24 +132,24 @@ func sendLoop() {
 	}
 }
 
-// Watchpoint is a helper to provide a fluent style api.
+// watchpoint is a helper to provide a fluent style api.
 // This allows for statements like hopwatch.Display("var",value).Break()
-type Watchpoint struct {
+type watchpoint struct {
 	disabled bool
 	offset   int
 }
 
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
-func Display(nameValuePairs ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset: 2}
+func Display(nameValuePairs ...interface{}) *watchpoint {
+	wp := &watchpoint{offset: 2}
 	return wp.Display(nameValuePairs...)
 }
 
 // Caller increases the caller offset to be displayed.
 // The Display and Break information will be displayed for the file of the function that called Caller.
-func Caller() *Watchpoint {
-	return &Watchpoint{offset: 3}
+func Caller() *watchpoint {
+	return &watchpoint{offset: 3}
 }
 
 // Break suspends the execution of the program and waits for an instruction from the debugger (e.g. Resume).
@@ -152,7 +160,7 @@ func Break(conditions ...bool) {
 
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
-func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
+func (self *watchpoint) Display(nameValuePairs ...interface{}) *watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "display"}
 	if ok {
@@ -176,11 +184,11 @@ func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
 
 // CallerOffset (default=2 and must be positive) allows you to change the file indicator in hopwatch.
 // Use this method when you wrap the Display(..).CallerOffset(2+1).Break() in your own function.
-func (self *Watchpoint) CallerOffset(offset int) *Watchpoint {
+func (self *watchpoint) CallerOffset(offset int) *watchpoint {
 	if offset > 0 {
 		self.offset = offset
 	} else {
-		log.Printf("[hopwatch] WARN: illegal caller offset:%v . Watchpoint is disabled.\n", offset)
+		log.Printf("[hopwatch] WARN: illegal caller offset:%v . watchpoint is disabled.\n", offset)
 		self.disabled = true
 	}
 	return self
@@ -188,13 +196,13 @@ func (self *Watchpoint) CallerOffset(offset int) *Watchpoint {
 
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
-func (self Watchpoint) Break(conditions ...bool) {
+func (self watchpoint) Break(conditions ...bool) {
 	suspend(self.offset, conditions...)
 }
 
 // Caller increases the caller offset to be displayed.
 // The Display and Break information will be displayed for the file of the function that called Caller.
-func (self *Watchpoint) Caller() *Watchpoint {
+func (self *watchpoint) Caller() *watchpoint {
 	self.offset += self.offset + 1
 	return self
 }

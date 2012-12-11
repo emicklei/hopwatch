@@ -11,6 +11,9 @@ func js(w http.ResponseWriter, req *http.Request) {
 	var wsUri = "ws://localhost:23456/hopwatch";
 	var output;
 	var websocket = new WebSocket(wsUri);	
+	var connected = false;
+	var suspended = false;
+	
 	function init() {
 		output = document.getElementById("output");
 		setupWebSocket();
@@ -22,11 +25,15 @@ func js(w http.ResponseWriter, req *http.Request) {
 		websocket.onerror = function(evt) { onError(evt) };
 	}
 	function onOpen(evt) {
-		writeToScreen("connected","info");
+		connected = true;
+		document.getElementById("disconnect").className = "buttonEnabled";
+		writeToScreen("<-> connected","info");		
 		sendConnected();
 	}
 	function onClose(evt) {
-		writeToScreen("disconnected","info");
+		connected = false;
+		document.getElementById("disconnect").className = "buttonDisabled";
+		writeToScreen(">-< disconnected","info");
 	}
 	function onMessage(evt) {
  		try {
@@ -41,7 +48,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         	sendResume();
         }
         if (cmd.Action == "break") {
-        	row(timeHHMMSS(), goline(cmd.Parameters), "", " program suspended", "suspend")
+        	handleSuspended();
         }				        				
 	}
 	function onError(evt) {
@@ -73,7 +80,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {
 		if (event.keyCode == 119) {
-			sendResume();
+			actionResume();
 			writeToScreen("program resumed","info");  // Really should ask Go for this status
 		}
 	}
@@ -93,6 +100,24 @@ func js(w http.ResponseWriter, req *http.Request) {
 		var f = parameters["go.file"]
 		f = f.substr(f.lastIndexOf("/")+1)
 		return f + ":" + parameters["go.line"]
+	}
+	function handleSuspended() {
+        suspended = true;
+        document.getElementById("resume").className = "buttonEnabled";
+        row(timeHHMMSS(), goline(cmd.Parameters), "", " program suspended", "suspend")	
+	}
+	function actionResume() {
+		if (!connected) return;
+		if (!suspended) return;
+		suspended = false;
+		document.getElementById("resume").className = "buttonDisabled";
+		sendResume();
+	}
+	function actionDisconnect() {
+		if (!connected) return;
+		connected = false;
+		document.getElementById("disconnect").className = "buttonDisabled";
+		sendQuit();
 	}
 	function timeHHMMSS() { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
 	function sendConnected() { doSend('{"Action":"connected"}'); }

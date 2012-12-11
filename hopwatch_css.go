@@ -53,10 +53,16 @@ func css(w http.ResponseWriter, req *http.Request) {
 	div#menu > a {
 		margin-right: 5px;
 		margin-bottom: 10px;
-		padding: 10px;
-		color: white;
-		background: #375EAB;				
+		padding: 10px;				
 	}
+	.buttonEnabled {
+		color: white;
+		background: #375EAB;
+	}
+	.buttonDisabled {
+		color: #375EAB;
+		background: white;
+	}	
 	div#menu > a,
 	div#menu > input {
 		padding: 10px;	

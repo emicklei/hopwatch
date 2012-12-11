@@ -21,9 +21,9 @@ func html(w http.ResponseWriter, req *http.Request) {
 				<a href="/hopwatch.html">Hopwatch - debugging tool</a>
 			</div>		
 			<div id="menu">
-				<a href="javascript:sendResume();">F8 - Resume</a>
-				<a href="javascript:sendQuit();">Disconnect</a>
-				<a href="http://go.pkgdoc.org/github.com/emicklei/hopwatch">About</a>
+				<a id="resume" class="buttonDisabled" href="javascript:actionResume();">F8 - Resume</a>
+				<a id="disconnect" class="buttonDisabled" href="javascript:actionDisconnect();">Disconnect</a>
+				<a class="buttonEnabled" href="http://go.pkgdoc.org/github.com/emicklei/hopwatch">About</a>
 			</div>
 		</div>
 	</div>
