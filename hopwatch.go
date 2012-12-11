@@ -13,8 +13,8 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
-	"sync"
 	"strings"
+	"sync"
 )
 
 // command is used to transport message to and from the debugger.
@@ -75,9 +75,6 @@ func connectHandler(ws *websocket.Conn) {
 		} else {
 			log.Printf("[hopwatch] closed old connection\n")
 		}
-		log.Printf("[hopwatch] resume accepting commands ...\n")
-		currentWebsocket = ws
-		return
 	}
 	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
@@ -90,7 +87,7 @@ func connectHandler(ws *websocket.Conn) {
 		connectChannel <- cmd
 		receiveLoop()
 	}
-	log.Printf("[hopwatch] stop accepting commands.\n")
+	log.Printf("[hopwatch] end accepting commands.\n")
 }
 
 // receiveLoop reads commands from the websocket and puts them onto a channel.
@@ -102,9 +99,12 @@ func receiveLoop() {
 			break
 		}
 		if "quit" == cmd.Action {
+			hopwatchEnabled = false
+			fromBrowserChannel <- cmd
 			break
+		} else {
+			fromBrowserChannel <- cmd
 		}
-		fromBrowserChannel <- cmd
 	}
 }
 
@@ -232,23 +232,24 @@ func suspend(callerOffset int, conditions ...bool) {
 
 // Peel off the part of the stack that lives in hopwatch
 func trimStack(stack string) string {
-	lines := strings.Split(stack,"\n")
+	lines := strings.Split(stack, "\n")
 	c := 0
-	for _ , line := range lines {
-		if strings.Index(line,"/hopwatch") == -1 {  // means no function in this package
+	for _, line := range lines {
+		if strings.Index(line, "/hopwatch") == -1 { // means no function in this package
 			break
 		}
 		c++
 	}
-	return strings.Join(lines[c:],"\n")
+	return strings.Join(lines[c:], "\n")
 }
+
 // Put a command on the browser channel and wait for the reply command
 func channelExchangeCommands(toCmd command) {
 	if !hopwatchEnabled {
 		return
 	}
 	// synchronize this
-	debuggerMutex.Lock()	
+	debuggerMutex.Lock()
 	toBrowserChannel <- toCmd
 	_ = <-fromBrowserChannel
 	debuggerMutex.Unlock()
