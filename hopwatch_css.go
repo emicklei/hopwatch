@@ -14,6 +14,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 		font-size: 16px;
 		color: #222;
 	}
+	td { vertical-align:top }
 	a { text-decoration:none; color: #375EAB; }
 	div#heading {
 		float: left;
@@ -78,7 +79,8 @@ func css(w http.ResponseWriter, req *http.Request) {
 		font-size: 14px;
 		margin: 40px 0;
 	}		
-		
+	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
+	.stack   {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#F8EEB9;border:1;padding:4px}
 	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#AAA;white-space:nowrap}
 	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
 	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;padding-left:8px;padding-right:8px;}

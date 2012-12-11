@@ -72,8 +72,32 @@ func js(w http.ResponseWriter, req *http.Request) {
 		txt.innerHTML = msg;
 		tr.appendChild(txt);
 		
+		if (stack != null && stack.length > 0) {
+			addNonEmptyStackTo(stack,txt);
+		}
+		
 		output.appendChild(tr);		
 	}
+	function addNonEmptyStackTo(stack,textCell) {
+		var toggle = document.createElement("a");
+		toggle.href = "#";
+		toggle.className = "toggle";
+		toggle.onclick = function() { toggleStack(toggle); };
+		toggle.innerHTML="stack";
+		textCell.appendChild(toggle);
+		
+		var stk = document.createElement("div");
+		stk.style.display = "none";
+		var lines = document.createElement("pre");
+		lines.innerHTML = stack	
+		lines.className = "stack"			
+		stk.appendChild(lines)		
+		textCell.appendChild(stk)	
+	}
+	function toggleStack(link) {
+		var stack = link.nextSibling;
+		stack.style.display = (stack.style.display == "none") ? "block" : "none";
+	}	
 	function writeToScreen(text,cls) {
 		row(timeHHMMSS(), "hopwatch", "", text ,cls)
 	}
@@ -104,7 +128,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function handleSuspended(cmd) {
         suspended = true;
         document.getElementById("resume").className = "buttonEnabled";
-        row(timeHHMMSS(), goline(cmd.Parameters), "", " program suspended", "suspend")	
+        row(timeHHMMSS(), goline(cmd.Parameters), cmd.Parameters["go.stack"], " program suspended", "suspend")	
 	}
 	function actionResume() {
 		if (!connected) return;

@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"runtime/debug"
 	"sync"
+	"strings"
 )
 
 // command is used to transport message to and from the debugger.
@@ -39,7 +40,7 @@ var connectChannel = make(chan command)
 var debuggerMutex = sync.Mutex{}
 
 func init() {
-	// see if disable is needed
+	// see if disable is needed. (needed when programs do not call flag.Parse() )
 	for i, arg := range os.Args {
 		if arg == "-hopwatch" && i < len(os.Args) && os.Args[i+1] == "false" {
 			log.Printf("[hopwatch] disabled.\n")
@@ -224,11 +225,23 @@ func suspend(callerOffset int, conditions ...bool) {
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
-		cmd.addParam("go.stack", string(debug.Stack()))
+		cmd.addParam("go.stack", trimStack(string(debug.Stack())))
 	}
 	channelExchangeCommands(cmd)
 }
 
+// Peel off the part of the stack that lives in hopwatch
+func trimStack(stack string) string {
+	lines := strings.Split(stack,"\n")
+	c := 0
+	for _ , line := range lines {
+		if strings.Index(line,"/hopwatch") == -1 {  // means no function in this package
+			break
+		}
+		c++
+	}
+	return strings.Join(lines[c:],"\n")
+}
 // Put a command on the browser channel and wait for the reply command
 func channelExchangeCommands(toCmd command) {
 	if !hopwatchEnabled {
