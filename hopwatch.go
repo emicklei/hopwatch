@@ -69,12 +69,8 @@ func listen() {
 // As soon as a command is received the receiveLoop is started. 
 func connectHandler(ws *websocket.Conn) {
 	if currentWebsocket != nil {
-		// reloading an already connected page ; close the old		
-		if err := currentWebsocket.Close(); err != nil {
-			log.Printf("[hopwatch] unable to close old connection\n")
-		} else {
-			log.Printf("[hopwatch] closed old connection\n")
-		}
+		log.Printf("[hopwatch] already connected to a debugger; Ignore this\n")
+		return
 	}
 	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
