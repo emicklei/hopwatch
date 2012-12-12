@@ -182,7 +182,7 @@ func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
 		for i := 0; i < len(nameValuePairs); i += 2 {
 			k := nameValuePairs[i]
 			v := nameValuePairs[i+1]
-			cmd.addParam(fmt.Sprint(k), fmt.Sprint(v))
+			cmd.addParam(fmt.Sprint(k), fmt.Sprintf("%#v",v))
 		}
 	} else {
 		log.Printf("[hopwatch] WARN: missing variable for Display(...) in: %v:%v\n", file, line)
