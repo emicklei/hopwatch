@@ -34,16 +34,13 @@ Other examples:
 	// zero or more name,value pairs ; no program suspend
 	hopwatch.Display("i",i , "j",j")	
 
-	// fixes the caller offset when the hopwatch statement is called inside your own wrapper function
-	hopwatch.Caller().Display("a",a)
-
 The flags are:
 
-	-hopwatch	if present and set to false then hopwatch is disabled and will not connect to the debugger.
+	-hopwatch	if set to false then hopwatch is disabled.
 
 Install:
 
-	go get github.com/emicklei/hopwatch
+	go get -u github.com/emicklei/hopwatch
 
 
 Resources:

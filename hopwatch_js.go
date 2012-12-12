@@ -31,9 +31,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		sendConnected();
 	}
 	function onClose(evt) {
-		connected = false;
-		document.getElementById("disconnect").className = "buttonDisabled";
-		writeToScreen(">-< disconnected","info");
+		handleDisconnected();
 	}
 	function onMessage(evt) {
  		try {
@@ -104,8 +102,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {
 		if (event.keyCode == 119) {
-			actionResume();
-			writeToScreen("program resumed","info");  // Really should ask Go for this status
+			actionResume();			
 		}
 	}
 	function watchParametersToHtml(parameters) {
@@ -128,13 +125,14 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function handleSuspended(cmd) {
         suspended = true;
         document.getElementById("resume").className = "buttonEnabled";
-        row(timeHHMMSS(), goline(cmd.Parameters), cmd.Parameters["go.stack"], " program suspended", "suspend")	
+        row(timeHHMMSS(), goline(cmd.Parameters), cmd.Parameters["go.stack"], "-> program suspended", "suspend")	
 	}
 	function actionResume() {
 		if (!connected) return;
 		if (!suspended) return;
 		suspended = false;
 		document.getElementById("resume").className = "buttonDisabled";
+		writeToScreen("<- resume program","info");
 		sendResume();
 	}
 	function actionDisconnect() {
@@ -142,6 +140,13 @@ func js(w http.ResponseWriter, req *http.Request) {
 		connected = false;
 		document.getElementById("disconnect").className = "buttonDisabled";
 		sendQuit();
+		writeToScreen("<-- disconnect requested","info");
+		websocket.close();  // seems not to trigger close on Go-side ; so handleDisconnected cannot be used here
+	}
+	function handleDisconnected() {
+		connected = false;
+		document.getElementById("disconnect").className = "buttonDisabled";
+		writeToScreen(">-< disconnected","info");	
 	}
 	function timeHHMMSS() { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
 	function sendConnected() { doSend('{"Action":"connected"}'); }

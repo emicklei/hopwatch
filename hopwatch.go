@@ -100,7 +100,10 @@ func receiveLoop() {
 		}
 		if "quit" == cmd.Action {
 			hopwatchEnabled = false
+			log.Printf("[hopwatch] browser requests disconnect.\n")
 			fromBrowserChannel <- cmd
+			currentWebsocket.Close() // TODO is not detected by Chrome
+			currentWebsocket = nil
 			break
 		} else {
 			fromBrowserChannel <- cmd
@@ -137,22 +140,16 @@ func sendLoop() {
 
 // watchpoint is a helper to provide a fluent style api.
 // This allows for statements like hopwatch.Display("var",value).Break()
-type watchpoint struct {
+type Watchpoint struct {
 	disabled bool
 	offset   int
 }
 
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
-func Display(nameValuePairs ...interface{}) *watchpoint {
-	wp := &watchpoint{offset: 2}
+func Display(nameValuePairs ...interface{}) *Watchpoint {
+	wp := &Watchpoint{offset: 2}
 	return wp.Display(nameValuePairs...)
-}
-
-// Caller increases the caller offset to be displayed.
-// The Display and Break information will be displayed for the file of the function that called Caller.
-func Caller() *watchpoint {
-	return &watchpoint{offset: 3}
 }
 
 // Break suspends the execution of the program and waits for an instruction from the debugger (e.g. Resume).
@@ -161,9 +158,20 @@ func Break(conditions ...bool) {
 	suspend(2, conditions...)
 }
 
+// CallerOffset (default=2) allows you to change the file indicator in hopwatch.
+// Use this method when you wrap the .CallerOffset(..).Display(..).Break() in your own function.
+func CallerOffset(offset int) *Watchpoint {
+	wp := &Watchpoint{offset: offset}
+	if offset < 0 {
+		log.Printf("[hopwatch] WARN: illegal caller offset:%v . watchpoint is disabled.\n", offset)
+		wp.disabled = true
+	}
+	return wp
+}
+
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
-func (self *watchpoint) Display(nameValuePairs ...interface{}) *watchpoint {
+func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "display"}
 	if ok {
@@ -185,31 +193,10 @@ func (self *watchpoint) Display(nameValuePairs ...interface{}) *watchpoint {
 	return self
 }
 
-// CallerOffset (default=2 and must be positive) allows you to change the file indicator in hopwatch.
-// Use this method when you wrap the Display(..).CallerOffset(2+1).Break() in your own function.
-// I suspect this is rarely needed.
-func (self *watchpoint) CallerOffset(offset int) *watchpoint {
-	if offset > 0 {
-		self.offset = offset
-	} else {
-		log.Printf("[hopwatch] WARN: illegal caller offset:%v . watchpoint is disabled.\n", offset)
-		self.disabled = true
-	}
-	return self
-}
-
 // Break halts the execution of the program and waits for an instruction from the debugger (e.g. Resume).
 // Break is only effective if all (if any) conditions are true. The program will resume otherwise.
-func (self watchpoint) Break(conditions ...bool) {
+func (self Watchpoint) Break(conditions ...bool) {
 	suspend(self.offset, conditions...)
-}
-
-// Caller increases the caller offset to be displayed.
-// The Display and Break information will be displayed for the file of the function that called Caller.
-// I suspect this is rarely needed.
-func (self *watchpoint) Caller() *watchpoint {
-	self.offset += self.offset + 1
-	return self
 }
 
 // suspend will create a new Command and send it to the browser.
@@ -248,12 +235,9 @@ func channelExchangeCommands(toCmd command) {
 	if !hopwatchEnabled {
 		return
 	}
-	// synchronize this
+	// synchronize command exchange ; break only one goroutine at a time
 	debuggerMutex.Lock()
 	toBrowserChannel <- toCmd
 	_ = <-fromBrowserChannel
 	debuggerMutex.Unlock()
-	//	if fromCmd == "resume" {
-	//		channelExchangeCommands(Command{Action:"status"}
-	//	}
 }
