@@ -42,7 +42,11 @@ func js(w http.ResponseWriter, req *http.Request) {
         }		
         console.log("[hopwatch] received: " + evt.data);
         if (cmd.Action == "display") {
-        	row(timeHHMMSS(), goline(cmd.Parameters), "", watchParametersToHtml(cmd.Parameters), "watch")
+        	var tr = document.createElement("tr");
+        	addTime(tr);
+        	addGoline(tr,cmd);
+        	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch");
+        	output.appendChild(tr);
         	sendResume();
         }
         if (cmd.Action == "break") {
@@ -52,37 +56,73 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function onError(evt) {
 		writeToScreen(evt,"err");
 	}
-	function row(time,goline,stack,msg,msgcls) {
+	function handleSuspended(cmd) {
+        suspended = true;
+        document.getElementById("resume").className = "buttonEnabled";
+        var tr = document.createElement("tr");
+       	addTime(tr);
+       	addGoline(tr,cmd);
+       	var td = addMessage(tr,"--> program suspended", "suspend");
+       	         addStack(td,cmd);       	
+       	output.appendChild(tr);        
+	}	
+	function writeToScreen(text,cls) {
 		var tr = document.createElement("tr");
-		
+		addTime(tr);
+		addEmptiness(tr);
+		addMessage(tr,text,cls)
+		output.appendChild(tr);
+	}	
+	function addTime(tr) {
 		var stamp = document.createElement("td");
-		stamp.innerHTML = time;
+		stamp.innerHTML = timeHHMMSS();
 		stamp.className = "time"
-		tr.appendChild(stamp);	
-			
-		var where = document.createElement("td");
-		where.className = "goline"		
-		where.innerHTML = goline;
-		tr.appendChild(where);	
-
+		tr.appendChild(stamp);			
+	}	
+	function addMessage(tr,msg,msgcls) {
 		var txt = document.createElement("td");
 		txt.className = msgcls		
 		txt.innerHTML = msg;
 		tr.appendChild(txt);
-		
-		if (stack != null && stack.length > 0) {
-			addNonEmptyStackTo(stack,txt);
-		}
-		
-		output.appendChild(tr);		
+		return txt;
 	}
-	function addNonEmptyStackTo(stack,textCell) {
+	function addEmptiness(tr) {
+		var empt = document.createElement("td");
+		empt.className = "goline"		
+		empt.innerHTML = "&nbsp;";
+		tr.appendChild(empt);
+	}
+	function addGoline(tr,cmd) {
+		var where = document.createElement("td");
+		
+//		var link = document.createElement("a");
+//		link.href = "#";
+//		link.className = "goline";
+//		link.onclick = function() { loadSource(cmd.Parameters["go.file"]); };
+//		link.innerHTML = goline(cmd.Parameters);
+//		where.appendChild(link);
+
+		where.className = "goline";
+		where.innerHTML = goline(cmd.Parameters);
+		
+		tr.appendChild(where);
+	}
+	function loadSource(fileName) {
+		$("#gosource").load("/gosource?file="+fileName);
+	}
+	function addStack(td,cmd) {
+		var stack = cmd.Parameters["go.stack"];
+		if (stack != null && stack.length > 0) {
+			addNonEmptyStackTo(stack,td);
+		}	
+	}	
+	function addNonEmptyStackTo(stack,td) {
 		var toggle = document.createElement("a");
 		toggle.href = "#";
 		toggle.className = "toggle";
 		toggle.onclick = function() { toggleStack(toggle); };
 		toggle.innerHTML="stack";
-		textCell.appendChild(toggle);
+		td.appendChild(toggle);
 		
 		var stk = document.createElement("div");
 		stk.style.display = "none";
@@ -90,15 +130,12 @@ func js(w http.ResponseWriter, req *http.Request) {
 		lines.innerHTML = stack	
 		lines.className = "stack"			
 		stk.appendChild(lines)		
-		textCell.appendChild(stk)	
+		td.appendChild(stk)	
 	}
 	function toggleStack(link) {
 		var stack = link.nextSibling;
 		stack.style.display = (stack.style.display == "none") ? "block" : "none";
 	}	
-	function writeToScreen(text,cls) {
-		row(timeHHMMSS(), "hopwatch", "", text ,cls)
-	}
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {
 		if (event.keyCode == 119) {
@@ -122,17 +159,12 @@ func js(w http.ResponseWriter, req *http.Request) {
 		f = f.substr(f.lastIndexOf("/")+1)
 		return f + ":" + parameters["go.line"]
 	}
-	function handleSuspended(cmd) {
-        suspended = true;
-        document.getElementById("resume").className = "buttonEnabled";
-        row(timeHHMMSS(), goline(cmd.Parameters), cmd.Parameters["go.stack"], "-> program suspended", "suspend")	
-	}
 	function actionResume() {
 		if (!connected) return;
 		if (!suspended) return;
 		suspended = false;
 		document.getElementById("resume").className = "buttonDisabled";
-		writeToScreen("<- resume program","info");
+		writeToScreen("<-- resume program","info");
 		sendResume();
 	}
 	function actionDisconnect() {
@@ -145,12 +177,13 @@ func js(w http.ResponseWriter, req *http.Request) {
 	}
 	function handleDisconnected() {
 		connected = false;
+		document.getElementById("resume").className = "buttonDisabled";
 		document.getElementById("disconnect").className = "buttonDisabled";
 		writeToScreen(">-< disconnected","info");	
 	}
-	function timeHHMMSS() { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
+	function timeHHMMSS()    { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
 	function sendConnected() { doSend('{"Action":"connected"}'); }
-	function sendResume()   { doSend('{"Action":"resume"}'); }
+	function sendResume()    { doSend('{"Action":"resume"}'); }
 	function sendQuit()      { doSend('{"Action":"quit"}'); }	
 	function doSend(message) {
 		console.log("[hopwatch] send: " + message);

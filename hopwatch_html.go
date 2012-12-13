@@ -11,7 +11,8 @@ func html(w http.ResponseWriter, req *http.Request) {
 <meta charset="utf-8" />
 <title>Hopwatch Debugger</title>
 <head>
-	<link href="hopwatch.css" rel="stylesheet" type="text/css" >
+	<link href="hopwatch.css" rel="stylesheet" type="text/css" >	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="hopwatch.js" ></script>
 </head>
 <body>
@@ -28,9 +29,14 @@ func html(w http.ResponseWriter, req *http.Request) {
 		</div>
 	</div>
 	<div id="page" class="wide">
-		<table id="output" style="width:100%"></table>
+		<div id="watchlines">
+			<table id="output"></table>
+		</div>
+		<!-- div id="gosource-wrapper">
+			<pre id="gosource" />
+		</div -->
 	</div>
-	<div id="footer">
+	<div id="footer" style="float:left; width:100%">
 		&copy; 2012. <a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
 	</div>
 </body>
