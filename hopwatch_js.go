@@ -1,3 +1,8 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+// Hopwatch is a debugging tool for Go programs.
 package hopwatch
 
 import (
@@ -107,9 +112,9 @@ func js(w http.ResponseWriter, req *http.Request) {
 		
 		tr.appendChild(where);
 	}
-	function loadSource(fileName) {
-		$("#gosource").load("/gosource?file="+fileName);
-	}
+//	function loadSource(fileName) {
+//		$("#gosource").load("/gosource?file="+fileName);
+//	}
 	function addStack(td,cmd) {
 		var stack = cmd.Parameters["go.stack"];
 		if (stack != null && stack.length > 0) {

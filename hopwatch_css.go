@@ -1,3 +1,8 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+// Hopwatch is a debugging tool for Go programs.
 package hopwatch
 
 import (
@@ -80,12 +85,13 @@ func css(w http.ResponseWriter, req *http.Request) {
 		font-size: 14px;
 		margin: 10px 0;
 	}
-	
+	div#watchlines { width: 100%; }
+/*	
 	div#page { float: left; }	
 	div#watchlines { float:left; width: 60%; }
 	div#gosource-wrapper { margin-left: 40%; }
 	pre#gosource { margin: 0; }
-				
+*/				
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#F8EEB9;border:1;padding:4px}
 	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#AAA;white-space:nowrap}

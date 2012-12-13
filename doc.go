@@ -3,11 +3,14 @@
 // license that can be found in the LICENSE file.
 
 /*
-Hopwatch is an experimental HTML5 application and Go package that can help debugging Go programs. 
+Hopwatch is a debugging tool for Go programs.  
 
-It works by communicating to a WebSockets based agent in Javascript.
-When your program calls the Break function, it sends debug information to the browser page and waits for user interaction.
-On the hopwatch page, the developer can view debug information and choose to proceed or terminate the execution of your program.
+Hopwatch uses a HTML5 application to connect to your program (using a Websocket).
+Using Hopwatch requires adding function calls at points of interest that allow you to watch program state and suspend the program.
+On the Hopwatch page, you can view debug information (file:line,stack) and choose to resume the execution of your program.
+
+You can provide more debug information using the Display function which takes an arbitrary number of variable,value pairs.
+The Display function itself does not suspend the program ; it is like having logging information in the browser.
 
 Usage:
 
@@ -24,11 +27,11 @@ Usage:
 Connect:
 
 	Open the Hopwatch debugger on http://localhost:23456/hopwatch.html after starting your program.
-	Your browser must support WebSockets.
+	Your browser must support WebSockets. It has been tested with Chrome and Safari on a Mac.
 
 Other examples:
 
-	// zero or more conditions ; suspends program (or goroutine)
+	// zero or more conditions ; conditionally suspends program (or goroutine)
 	hopwatch.Break(i > 10,  j < 100)	
 
 	// zero or more name,value pairs ; no program suspend

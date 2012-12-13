@@ -1,3 +1,8 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+// Hopwatch is a debugging tool for Go programs.
 package hopwatch
 
 import (
@@ -12,7 +17,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 <title>Hopwatch Debugger</title>
 <head>
 	<link href="hopwatch.css" rel="stylesheet" type="text/css" >	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+	<!-- script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script -->
 	<script type="text/javascript" src="hopwatch.js" ></script>
 </head>
 <body>

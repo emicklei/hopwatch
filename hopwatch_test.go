@@ -1,3 +1,8 @@
+// Copyright 2012 Ernest Micklei. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+// Hopwatch is a debugging tool for Go programs.
 package hopwatch
 
 import (
@@ -7,7 +12,7 @@ import (
 
 func TestWatchpoint_Caller(t *testing.T) {
 	go shortCircuit(commandResume())
-	Caller().Break()
+	CallerOffset(2).Break()
 }
 
 func commandResume() command {
