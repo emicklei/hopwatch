@@ -168,7 +168,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		if (!suspended) return;
 		suspended = false;
 		document.getElementById("resume").className = "buttonDisabled";
-		writeToScreen("<-- resume program","info");
+		// writeToScreen("<-- resume program","info");
 		sendResume();
 	}
 	function actionDisconnect() {
