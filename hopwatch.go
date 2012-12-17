@@ -8,6 +8,7 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"flag"
 	"fmt"
+	"github.com/toqueteos/webbrowser"
 	"log"
 	"net/http"
 	"os"
@@ -67,7 +68,8 @@ func gosource(w http.ResponseWriter, req *http.Request) {
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
 func listen() {
-	log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
+	log.Printf("[hopwatch] opening http://localhost:23456/hopwatch.html ...\n")
+	go webbrowser.Open("http://localhost:23456/hopwatch.html")
 	if err := http.ListenAndServe(":23456", nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
