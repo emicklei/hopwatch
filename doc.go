@@ -35,7 +35,10 @@ Other examples:
 	hopwatch.Break(i > 10,  j < 100)	
 
 	// zero or more name,value pairs ; no program suspend
-	hopwatch.Display("i",i , "j",j")	
+	hopwatch.Display("i",i , "j",j")
+	
+	// print any formatted string ; no program suspend
+	hopwatch.Printf("result=%v", result)		
 
 The flags are:
 
@@ -48,8 +51,8 @@ Install:
 
 Resources:
 
-	https://github.com/emicklei/hopwatch
-	http://ernestmicklei.com  (blog)
+	https://github.com/emicklei/hopwatch (project)
+	http://ernestmicklei.com/2012/12/14/hopwatch-a-debugging-tool-for-go/  (blog)
 
 
 (c) 2012, Ernest Micklei. MIT License
