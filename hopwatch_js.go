@@ -52,9 +52,20 @@ func js(w http.ResponseWriter, req *http.Request) {
         	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch");
         	output.appendChild(tr);
         	sendResume();
+        	return;
         }
+        if (cmd.Action == "print") {
+        	var tr = document.createElement("tr");
+        	addTime(tr);
+        	addGoline(tr,cmd);
+        	addMessage(tr,cmd.Parameters["line"],"watch");
+        	output.appendChild(tr);
+        	sendResume();
+        	return;
+        }        
         if (cmd.Action == "break") {
         	handleSuspended(cmd);
+        	return;
         }				        				
 	}
 	function onError(evt) {

@@ -149,6 +149,13 @@ type Watchpoint struct {
 	offset   int
 }
 
+// Printf formats according to a format specifier and writes to the debugger screen. 
+// It returns a new Watchpoint to send more or break.
+func Printf(format string, value ...interface{}) *Watchpoint {
+	wp := &Watchpoint{offset: 2}
+	return wp.Printf(format,value...)	
+}
+
 // Display sends variable name,value pairs to the debugger.
 // The parameter nameValuePairs must be even sized.
 func Display(nameValuePairs ...interface{}) *Watchpoint {
@@ -167,13 +174,26 @@ func Break(conditions ...bool) {
 func CallerOffset(offset int) *Watchpoint {
 	wp := &Watchpoint{offset: offset}
 	if offset < 0 {
-		log.Printf("[hopwatch] WARN: illegal caller offset:%v . watchpoint is disabled.\n", offset)
+		log.Panicf("[hopwatch] ERROR: illegal caller offset:%v . watchpoint is disabled.\n", offset)
 		wp.disabled = true
 	}
 	return wp
 }
 
-// Display sends variable name,value pairs to the debugger.
+// Printf formats according to a format specifier and writes to the debugger screen. 
+func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {	
+	_, file, line, ok := runtime.Caller(self.offset)
+	cmd := command{Action: "print"}
+	if ok {
+		cmd.addParam("go.file", file)
+		cmd.addParam("go.line", fmt.Sprint(line))
+	}
+	cmd.addParam("line",fmt.Sprintf(format, value...))
+	channelExchangeCommands(cmd)
+	return self	
+}
+
+// Display sends variable name,value pairs to the debugger. Values are formatted using %#v.
 // The parameter nameValuePairs must be even sized.
 func (self *Watchpoint) Display(nameValuePairs ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)

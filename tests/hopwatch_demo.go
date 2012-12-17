@@ -9,6 +9,7 @@ func main() {
 		hopwatch.Display("i",i)
 		j := i * i
 		hopwatch.Display("i",i, "j", j ).Break(j > 10)
+		hopwatch.Printf("%#v", "printf formatted value(s)")
 		hopwatch.Break()
 	}
 }
