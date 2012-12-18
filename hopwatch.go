@@ -8,10 +8,10 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"flag"
 	"fmt"
-	"github.com/toqueteos/webbrowser"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -65,25 +65,46 @@ func gosource(w http.ResponseWriter, req *http.Request) {
 	http.ServeFile(w, req, fileName)
 }
 
+func openBrowser(url string) error {
+	var cmd *exec.Cmd
+	runtime.Gosched() //yield to http listener
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "linux":
+		cmd = exec.Command("xdg-open", url)
+	default:
+		cmd = exec.Command("xdg-open", url) //inaccurate assumption but satisfies many BSDs
+	}
+	log.Printf("[hopwatch] > %s\n", cmd.Args)
+	if err := cmd.Start(); err != nil {
+		log.Printf("[hopwatch] failed automatic opening of %s - %v, try manually...\n", url, err.Error())
+	}
+}
+
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
 func listen() {
-	log.Printf("[hopwatch] opening http://localhost:23456/hopwatch.html ...\n")
-	go webbrowser.Open("http://localhost:23456/hopwatch.html")
-	if err := http.ListenAndServe(":23456", nil); err != nil {
+	port := ":23456"
+
+	go openBrowser("http://localhost" + port + "/hopwatch.html")
+
+	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
 }
 
 // connectHandler is a Http handler and is called on loading the debugger in a browser.
-// As soon as a command is received the receiveLoop is started. 
+// As soon as a command is received the receiveLoop is started.
 func connectHandler(ws *websocket.Conn) {
 	if currentWebsocket != nil {
 		log.Printf("[hopwatch] already connected to a debugger; Ignore this\n")
 		return
 	}
 	log.Printf("[hopwatch] begin accepting commands ...\n")
-	// remember the connection for the sendLoop	
+	// remember the connection for the sendLoop
 	currentWebsocket = ws
 	var cmd command
 	if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
@@ -151,11 +172,11 @@ type Watchpoint struct {
 	offset   int
 }
 
-// Printf formats according to a format specifier and writes to the debugger screen. 
+// Printf formats according to a format specifier and writes to the debugger screen.
 // It returns a new Watchpoint to send more or break.
 func Printf(format string, value ...interface{}) *Watchpoint {
 	wp := &Watchpoint{offset: 2}
-	return wp.Printf(format,value...)	
+	return wp.Printf(format, value...)
 }
 
 // Display sends variable name,value pairs to the debugger.
@@ -182,17 +203,17 @@ func CallerOffset(offset int) *Watchpoint {
 	return wp
 }
 
-// Printf formats according to a format specifier and writes to the debugger screen. 
-func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {	
+// Printf formats according to a format specifier and writes to the debugger screen.
+func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "print"}
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	cmd.addParam("line",fmt.Sprintf(format, value...))
+	cmd.addParam("line", fmt.Sprintf(format, value...))
 	channelExchangeCommands(cmd)
-	return self	
+	return self
 }
 
 // Display sends variable name,value pairs to the debugger. Values are formatted using %#v.
