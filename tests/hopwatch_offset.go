@@ -23,5 +23,10 @@ func indirectBreak() {
 	hopwatch.CallerOffset(3).Break()
 }
 func illegalOffset() {
+	defer func() {
+		if r := recover(); r != nil {
+            print("Recovered in illegalOffset")
+        }
+	}()
 	hopwatch.CallerOffset(-1).Break()
 }

@@ -15,6 +15,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"os/exec"
 )
 
 // command is used to transport message to and from the debugger.
@@ -33,6 +34,9 @@ func (self *command) addParam(key, value string) {
 
 var hopwatchParam = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
 var hopwatchEnabled = true
+var hopwatchOpenParam = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
+var hopwatchOpenEnabled = true
+
 var currentWebsocket *websocket.Conn
 var toBrowserChannel = make(chan command)
 var fromBrowserChannel = make(chan command)
@@ -47,6 +51,10 @@ func init() {
 			hopwatchEnabled = false
 			return
 		}
+		if arg == "-hopwatch.open" && i < len(os.Args) && os.Args[i+1] == "false" {
+			log.Printf("[hopwatch] auto open debugger disabled.\n")
+			hopwatchOpenEnabled = false
+		}		
 	}
 	http.HandleFunc("/hopwatch.html", html)
 	http.HandleFunc("/hopwatch.css", css)
@@ -55,6 +63,18 @@ func init() {
 	http.Handle("/hopwatch", websocket.Handler(connectHandler))
 	go listen()
 	go sendLoop()
+}
+
+// Open calls the OS default program for uri
+func open(uri string) error {
+		var run string
+		switch {
+			case "windows" == runtime.GOOS : run = "start"
+			case "darwin" == runtime.GOOS : run = "open"
+			case "linux" == runtime.GOOS : run = "xdg-open"
+			default : return fmt.Errorf("Unable to open uri:%v on:%v", uri, runtime.GOOS)
+		}
+        return exec.Command(run, uri).Start()
 }
 
 // serve a (source) file for displaying in the debugger
@@ -66,8 +86,13 @@ func gosource(w http.ResponseWriter, req *http.Request) {
 
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
-func listen() {
-	log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
+func listen() {	
+	if hopwatchOpenEnabled {
+		log.Printf("[hopwatch] opening http://localhost:23456/hopwatch.html ...\n")
+		go open("http://localhost:23456/hopwatch.html")
+	} else {
+		log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
+	}
 	if err := http.ListenAndServe(":23456", nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
@@ -85,7 +110,7 @@ func connectHandler(ws *websocket.Conn) {
 	currentWebsocket = ws
 	var cmd command
 	if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
-		log.Printf("[hopwatch] JSON.Receive failed:%v", err)
+		log.Printf("[hopwatch] connectHandler.JSON.Receive failed:%v", err)
 	} else {
 		log.Printf("[hopwatch] connected to browser. ready to hop")
 		connectChannel <- cmd
@@ -99,7 +124,8 @@ func receiveLoop() {
 	for {
 		var cmd command
 		if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
-			log.Printf("[hopwatch] JSON.Receive failed:%v", err)
+			log.Printf("[hopwatch] receiveLoop.JSON.Receive failed:%v", err)
+			fromBrowserChannel <- command{Action: "quit"}
 			break
 		}
 		if "quit" == cmd.Action {

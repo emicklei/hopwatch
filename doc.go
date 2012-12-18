@@ -42,7 +42,8 @@ Other examples:
 
 The flags are:
 
-	-hopwatch	if set to false then hopwatch is disabled.
+	-hopwatch		if set to false then hopwatch is disabled.
+	-hopwatch.open	if set to false then hopwatch will not try to open the debugger page on startup.
 
 Install:
 
