@@ -1,4 +1,4 @@
-// Copyright 2012 Ernest Micklei. All rights reserved.
+// Copyright 2012-2013 Ernest Micklei. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 func js(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/javascript")
 	io.WriteString(w, `
-	var wsUri = "ws://localhost:23456/hopwatch";
+	var wsUri = "ws://" + window.location.hostname + ":" + window.location.port + "/hopwatch";
 	var output;
 	var websocket = new WebSocket(wsUri);	
 	var connected = false;

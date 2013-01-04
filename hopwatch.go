@@ -11,11 +11,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"sync"
-	"os/exec"
 )
 
 // command is used to transport message to and from the debugger.
@@ -32,10 +33,15 @@ func (self *command) addParam(key, value string) {
 	self.Parameters[key] = value
 }
 
+var hopwatchHostParam = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
+var hopwatchPortParam = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
 var hopwatchParam = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
-var hopwatchEnabled = true
 var hopwatchOpenParam = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
+
+var hopwatchEnabled = true
 var hopwatchOpenEnabled = true
+var hopwatchHost = "localhost"
+var hopwatchPort int64 = 23456
 
 var currentWebsocket *websocket.Conn
 var toBrowserChannel = make(chan command)
@@ -44,7 +50,7 @@ var connectChannel = make(chan command)
 var debuggerMutex = sync.Mutex{}
 
 func init() {
-	// see if disable is needed. (needed when programs do not call flag.Parse() )
+	// check any command line params. (needed when programs do not call flag.Parse() )
 	for i, arg := range os.Args {
 		if arg == "-hopwatch" && i < len(os.Args) && os.Args[i+1] == "false" {
 			log.Printf("[hopwatch] disabled.\n")
@@ -54,7 +60,17 @@ func init() {
 		if arg == "-hopwatch.open" && i < len(os.Args) && os.Args[i+1] == "false" {
 			log.Printf("[hopwatch] auto open debugger disabled.\n")
 			hopwatchOpenEnabled = false
-		}		
+		}
+		if arg == "-hopwatch.host" && i < len(os.Args) {
+			hopwatchHost = os.Args[i+1]
+		}
+		if arg == "-hopwatch.port" && i < len(os.Args) {
+			port, err := strconv.ParseInt(os.Args[i+1], 10, 8)
+			if err != nil {
+				log.Panicf("[hopwatch] illegal port parameter:%v", err)
+			}
+			hopwatchPort = port
+		}
 	}
 	http.HandleFunc("/hopwatch.html", html)
 	http.HandleFunc("/hopwatch.css", css)
@@ -67,14 +83,18 @@ func init() {
 
 // Open calls the OS default program for uri
 func open(uri string) error {
-		var run string
-		switch {
-			case "windows" == runtime.GOOS : run = "start"
-			case "darwin" == runtime.GOOS : run = "open"
-			case "linux" == runtime.GOOS : run = "xdg-open"
-			default : return fmt.Errorf("Unable to open uri:%v on:%v", uri, runtime.GOOS)
-		}
-        return exec.Command(run, uri).Start()
+	var run string
+	switch {
+	case "windows" == runtime.GOOS:
+		run = "start"
+	case "darwin" == runtime.GOOS:
+		run = "open"
+	case "linux" == runtime.GOOS:
+		run = "xdg-open"
+	default:
+		return fmt.Errorf("Unable to open uri:%v on:%v", uri, runtime.GOOS)
+	}
+	return exec.Command(run, uri).Start()
 }
 
 // serve a (source) file for displaying in the debugger
@@ -86,14 +106,15 @@ func gosource(w http.ResponseWriter, req *http.Request) {
 
 // listen starts a Http Server on a fixed port.
 // listen is run in parallel to the initialization process such that it does not block.
-func listen() {	
+func listen() {
+	hostPort := fmt.Sprintf("%s:%d", hopwatchHost, hopwatchPort)
 	if hopwatchOpenEnabled {
-		log.Printf("[hopwatch] opening http://localhost:23456/hopwatch.html ...\n")
-		go open("http://localhost:23456/hopwatch.html")
+		log.Printf("[hopwatch] opening http://%v/hopwatch.html ...\n", hostPort)
+		go open(fmt.Sprintf("http://%v/hopwatch.html", hostPort))
 	} else {
-		log.Printf("[hopwatch] open http://localhost:23456/hopwatch.html ...\n")
+		log.Printf("[hopwatch] open http://%v/hopwatch.html ...\n", hostPort)
 	}
-	if err := http.ListenAndServe(":23456", nil); err != nil {
+	if err := http.ListenAndServe(hostPort, nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
 }
@@ -179,7 +200,7 @@ type Watchpoint struct {
 // It returns a new Watchpoint to send more or break.
 func Printf(format string, value ...interface{}) *Watchpoint {
 	wp := &Watchpoint{offset: 2}
-	return wp.Printf(format,value...)	
+	return wp.Printf(format, value...)
 }
 
 // Display sends variable name,value pairs to the debugger.
@@ -207,16 +228,16 @@ func CallerOffset(offset int) *Watchpoint {
 }
 
 // Printf formats according to a format specifier and writes to the debugger screen. 
-func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {	
+func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "print"}
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	cmd.addParam("line",fmt.Sprintf(format, value...))
+	cmd.addParam("line", fmt.Sprintf(format, value...))
 	channelExchangeCommands(cmd)
-	return self	
+	return self
 }
 
 // Display sends variable name,value pairs to the debugger. Values are formatted using %#v.

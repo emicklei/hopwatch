@@ -36,7 +36,7 @@ Other examples:
 
 	// zero or more name,value pairs ; no program suspend
 	hopwatch.Display("i",i , "j",j")
-	
+
 	// print any formatted string ; no program suspend
 	hopwatch.Printf("result=%v", result)		
 
@@ -44,6 +44,8 @@ The flags are:
 
 	-hopwatch		if set to false then hopwatch is disabled.
 	-hopwatch.open	if set to false then hopwatch will not try to open the debugger page on startup.
+	-hopwatch.host	tcp hostname of the listener address (default = localhost).
+	-hopwatch.port	tcp port of the listener address (default = 23456).
 
 Install:
 
@@ -56,6 +58,6 @@ Resources:
 	http://ernestmicklei.com/2012/12/14/hopwatch-a-debugging-tool-for-go/  (blog)
 
 
-(c) 2012, Ernest Micklei. MIT License
+(c) 2012-2013, Ernest Micklei. MIT License
 */
 package hopwatch
