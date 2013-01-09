@@ -198,9 +198,9 @@ type Watchpoint struct {
 
 // Printf formats according to a format specifier and writes to the debugger screen. 
 // It returns a new Watchpoint to send more or break.
-func Printf(format string, value ...interface{}) *Watchpoint {
+func Printf(format string, params ...interface{}) *Watchpoint {
 	wp := &Watchpoint{offset: 2}
-	return wp.Printf(format, value...)
+	return wp.Printf(format, params...)
 }
 
 // Display sends variable name,value pairs to the debugger.
@@ -228,14 +228,18 @@ func CallerOffset(offset int) *Watchpoint {
 }
 
 // Printf formats according to a format specifier and writes to the debugger screen. 
-func (self *Watchpoint) Printf(format string, value ...interface{}) *Watchpoint {
+func (self *Watchpoint) Printf(format string, params ...interface{}) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "print"}
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	cmd.addParam("line", fmt.Sprintf(format, value...))
+	if len(params) == 0 {
+		cmd.addParam("line", format)
+	} else {
+		cmd.addParam("line", fmt.Sprintf(format, params...))
+	}
 	channelExchangeCommands(cmd)
 	return self
 }
