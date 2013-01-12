@@ -52,20 +52,34 @@ var debuggerMutex = sync.Mutex{}
 func init() {
 	// check any command line params. (needed when programs do not call flag.Parse() )
 	for i, arg := range os.Args {
-		if arg == "-hopwatch" && i < len(os.Args) && os.Args[i+1] == "false" {
-			log.Printf("[hopwatch] disabled.\n")
-			hopwatchEnabled = false
-			return
+		if strings.HasPrefix(arg,"-hopwatch") {
+			if strings.HasSuffix(arg,"false") {
+				log.Printf("[hopwatch] disabled.\n")
+				hopwatchEnabled = false
+				return
+			}
 		}
-		if arg == "-hopwatch.open" && i < len(os.Args) && os.Args[i+1] == "false" {
-			log.Printf("[hopwatch] auto open debugger disabled.\n")
-			hopwatchOpenEnabled = false
+		if strings.HasPrefix(arg,"-hopwatch.open") {
+			if strings.HasSuffix(arg,"false") {
+				log.Printf("[hopwatch] auto open debugger disabled.\n")
+				hopwatchOpenEnabled = false
+			}
+		}	
+		if strings.HasPrefix(arg,"-hopwatch.host") {
+			if eq := strings.Index(arg,"="); eq != -1 {
+				hopwatchHost = arg[eq+1:]	
+			} else if i < len(os.Args) {
+				hopwatchHost = os.Args[i+1]
+			}
 		}
-		if arg == "-hopwatch.host" && i < len(os.Args) {
-			hopwatchHost = os.Args[i+1]
-		}
-		if arg == "-hopwatch.port" && i < len(os.Args) {
-			port, err := strconv.ParseInt(os.Args[i+1], 10, 8)
+		if strings.HasPrefix(arg,"-hopwatch.port") {
+			portString := ""
+			if eq := strings.Index(arg,"="); eq != -1 {
+				portString = arg[eq+1:]	
+			} else if i < len(os.Args) {
+				portString = os.Args[i+1]
+			}
+			port, err := strconv.ParseInt(portString, 10, 8)
 			if err != nil {
 				log.Panicf("[hopwatch] illegal port parameter:%v", err)
 			}
