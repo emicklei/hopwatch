@@ -41,7 +41,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 		</div -->
 	</div>
 	<div id="footer" style="float:left; width:100%">
-		&copy; 2012. <a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
+		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
 	</div>
 </body>
 </html>

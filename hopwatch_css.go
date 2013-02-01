@@ -94,7 +94,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#F8EEB9;border:1;padding:4px}
 	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#AAA;white-space:nowrap}
-	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
+	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;white-space:pre;}
 	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;width:100%;}
 	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}
