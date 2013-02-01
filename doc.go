@@ -42,11 +42,11 @@ Other examples:
 
 Integration with https://github.com/davecgh/go-spew (go-spew)
 
-	// using go-spew Printf
-	hopwatch.Spew().Printf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
+	// uses go-spew Dump
+	hopwatch.Dump(myVar1, myVar2)
 
-	// using go-spew Dump
-	hopwatch.Spew().Dump(myVar1, myVar2)
+	// uses go-spew Printf
+	hopwatch.Dumpf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
 
 The flags are:
 

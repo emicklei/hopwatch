@@ -12,7 +12,8 @@ type node struct {
 
 func main() {
 	tree := node{label:"parent", children:[]node{node{label:"child"}}}
-	
-	hopwatch.Spew().Printf("spew %v","it")	
-	hopwatch.Spew().Dump(tree)
+
+	// uses go-spew, see https://github.com/davecgh/go-spew
+	hopwatch.Dump(tree)
+	hopwatch.Dumpf("kids %#+v",tree.children)
 }
