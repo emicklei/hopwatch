@@ -38,7 +38,15 @@ Other examples:
 	hopwatch.Display("i",i , "j",j")
 
 	// print any formatted string ; no program suspend
-	hopwatch.Printf("result=%v", result)		
+	hopwatch.Printf("result=%v", result)
+
+Integration with https://github.com/davecgh/go-spew (go-spew)
+
+	// using go-spew Printf
+	hopwatch.Spew().Printf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
+
+	// using go-spew Dump
+	hopwatch.Spew().Dump(myVar1, myVar2)
 
 The flags are:
 

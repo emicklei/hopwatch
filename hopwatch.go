@@ -52,30 +52,30 @@ var debuggerMutex = sync.Mutex{}
 func init() {
 	// check any command line params. (needed when programs do not call flag.Parse() )
 	for i, arg := range os.Args {
-		if strings.HasPrefix(arg,"-hopwatch") {
-			if strings.HasSuffix(arg,"false") {
+		if strings.HasPrefix(arg, "-hopwatch") {
+			if strings.HasSuffix(arg, "false") {
 				log.Printf("[hopwatch] disabled.\n")
 				hopwatchEnabled = false
 				return
 			}
 		}
-		if strings.HasPrefix(arg,"-hopwatch.open") {
-			if strings.HasSuffix(arg,"false") {
+		if strings.HasPrefix(arg, "-hopwatch.open") {
+			if strings.HasSuffix(arg, "false") {
 				log.Printf("[hopwatch] auto open debugger disabled.\n")
 				hopwatchOpenEnabled = false
 			}
-		}	
-		if strings.HasPrefix(arg,"-hopwatch.host") {
-			if eq := strings.Index(arg,"="); eq != -1 {
-				hopwatchHost = arg[eq+1:]	
+		}
+		if strings.HasPrefix(arg, "-hopwatch.host") {
+			if eq := strings.Index(arg, "="); eq != -1 {
+				hopwatchHost = arg[eq+1:]
 			} else if i < len(os.Args) {
 				hopwatchHost = os.Args[i+1]
 			}
 		}
-		if strings.HasPrefix(arg,"-hopwatch.port") {
+		if strings.HasPrefix(arg, "-hopwatch.port") {
 			portString := ""
-			if eq := strings.Index(arg,"="); eq != -1 {
-				portString = arg[eq+1:]	
+			if eq := strings.Index(arg, "="); eq != -1 {
+				portString = arg[eq+1:]
 			} else if i < len(os.Args) {
 				portString = os.Args[i+1]
 			}
@@ -243,17 +243,25 @@ func CallerOffset(offset int) *Watchpoint {
 
 // Printf formats according to a format specifier and writes to the debugger screen. 
 func (self *Watchpoint) Printf(format string, params ...interface{}) *Watchpoint {
+	self.offset += 1
+	var content string
+	if len(params) == 0 {
+		content = format
+	} else {
+		content = fmt.Sprintf(format, params...)
+	}
+	return self.printcontent(content)
+}
+
+// Printf formats according to a format specifier and writes to the debugger screen. 
+func (self *Watchpoint) printcontent(content string) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "print"}
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
 	}
-	if len(params) == 0 {
-		cmd.addParam("line", format)
-	} else {
-		cmd.addParam("line", fmt.Sprintf(format, params...))
-	}
+	cmd.addParam("line", content)
 	channelExchangeCommands(cmd)
 	return self
 }
