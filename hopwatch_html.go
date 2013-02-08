@@ -33,12 +33,19 @@ func html(w http.ResponseWriter, req *http.Request) {
 		</div>
 	</div>
 	<div id="page" class="wide">
-		<div id="watchlines">
+		<div id="log-pane">
 			<table id="output"></table>
 		</div>
-		<!-- div id="gosource-wrapper">
-			<pre id="gosource" />
-		</div -->
+		<div id="watch-pane">
+			<table id="vars">
+				<tr><td>Watch me</td></tr>
+			</table>
+		</div>		
+		<div id="gosource-pane">
+			<pre id="gosource">
+				i welcome any go source here...
+			</pre>
+		</div>
 	</div>
 	<div id="footer" style="float:left; width:100%">
 		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
