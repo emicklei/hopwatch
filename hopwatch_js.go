@@ -110,21 +110,26 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function addGoline(tr,cmd) {
 		var where = document.createElement("td");
 		
-//		var link = document.createElement("a");
-//		link.href = "#";
-//		link.className = "goline";
-//		link.onclick = function() { loadSource(cmd.Parameters["go.file"]); };
-//		link.innerHTML = goline(cmd.Parameters);
-//		where.appendChild(link);
+		var link = document.createElement("a");
+		link.href = "#";
+		link.className = "goline";
+		link.onclick = function() { loadSource(cmd.Parameters["go.file"]); };
+		link.innerHTML = goline(cmd.Parameters);
+		where.appendChild(link);
 
-		where.className = "goline";
-		where.innerHTML = goline(cmd.Parameters);
+//		where.className = "goline";
+//		where.innerHTML = goline(cmd.Parameters);
 		
 		tr.appendChild(where);
 	}
-//	function loadSource(fileName) {
-//		$("#gosource").load("/gosource?file="+fileName);
-//	}
+	function loadSource(fileName) {
+		$("#gofile").html(shortenFileName(fileName));
+		$("#gosource-pane").show();
+		$("#gosource").load("/gosource?file="+fileName);
+	}
+	function shortenFileName(fileName) {
+		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
+	}
 	function addStack(td,cmd) {
 		var stack = cmd.Parameters["go.stack"];
 		if (stack != null && stack.length > 0) {
@@ -201,7 +206,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function sendResume()    { doSend('{"Action":"resume"}'); }
 	function sendQuit()      { doSend('{"Action":"quit"}'); }	
 	function doSend(message) {
-		console.log("[hopwatch] send: " + message);
+		// ^console.log("[hopwatch] send: " + message);
 		websocket.send(message);
 	}
 	window.addEventListener("load", init, false);

@@ -20,6 +20,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 	}
 	td { vertical-align:top }
 	a { text-decoration:none; color: #375EAB; }
+	a:hover { text-decoration:underline ; color:black }
 	div#heading {
 		float: left;
 		margin: 0 0 10px 0;
@@ -86,14 +87,14 @@ func css(w http.ResponseWriter, req *http.Request) {
 	}
 	div#page { float: left; }
 		div#log-pane { float:left; width: 60%; }
-		div#watch-pane { width: 40%; }
-		div#gosource-pane { width: 100%; }
-		pre#gosource { margin: 0; }
+		div#gofile { font-family:"Lucida Console", Monaco, monospace; color:#888 }
+		div#gosource-pane { margin-left: 60% ; display: none; background: #FFD; }
+		pre#gosource { font-size:small }
 	
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#F8EEB9;border:1;padding:4px}
 	.time    {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#AAA;white-space:nowrap}
-	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;white-space:pre;}
+	.watch 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%}
 	.goline  {font-family:"Lucida Console", Monaco, monospace;font-size:small;color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;background-color:#FF3300;width:100%;}
 	.info 	 {font-family:"Lucida Console", Monaco, monospace;font-size:small;width:100%;}

@@ -16,7 +16,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 <title>Hopwatch Debugger</title>
 <head>
 	<link href="hopwatch.css" rel="stylesheet" type="text/css" >	
-	<!-- script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="hopwatch.js" ></script>
 </head>
 <body>
@@ -28,27 +28,23 @@ func html(w http.ResponseWriter, req *http.Request) {
 			<div id="menu">
 				<a id="resume" class="buttonDisabled" href="javascript:actionResume();">F8 - Resume</a>
 				<a id="disconnect" class="buttonDisabled" href="javascript:actionDisconnect();">Disconnect</a>
-				<a class="buttonEnabled" href="http://go.pkgdoc.org/github.com/emicklei/hopwatch">About</a>
+				<a class="buttonEnabled" href="http://go.pkgdoc.org/github.com/emicklei/hopwatch" target="_blank">About</a>
 			</div>
 		</div>
 	</div>
 	<div id="page" class="wide">
 		<div id="log-pane">
 			<table id="output"></table>
-		</div>
-		<div id="watch-pane">
-			<table id="vars">
-				<tr><td>Watch me</td></tr>
-			</table>
 		</div>		
-		<div id="gosource-pane">
+		<div id="gosource-pane" title="somefile.go">
+			<div id="gofile">somefile.go</div>
 			<pre id="gosource">
-				i welcome any go source here...
+				loading go source...
 			</pre>
 		</div>
 	</div>
 	<div id="footer" style="float:left; width:100%">
-		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch">hopwatch on github.com</a>
+		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch" target="_blank">hopwatch on github.com</a>
 	</div>
 </body>
 </html>

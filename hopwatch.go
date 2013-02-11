@@ -33,26 +33,28 @@ func (self *command) addParam(key, value string) {
 	self.Parameters[key] = value
 }
 
-var hopwatchHostParam = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
-var hopwatchPortParam = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
-var hopwatchParam = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
-var hopwatchOpenParam = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
+var (
+	hopwatchHostParam = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
+	hopwatchPortParam = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
+	hopwatchParam     = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
+	hopwatchOpenParam = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
 
-var hopwatchEnabled = true
-var hopwatchOpenEnabled = true
-var hopwatchHost = "localhost"
-var hopwatchPort int64 = 23456
+	hopwatchEnabled           = true
+	hopwatchOpenEnabled       = true
+	hopwatchHost              = "localhost"
+	hopwatchPort        int64 = 23456
 
-var currentWebsocket *websocket.Conn
-var toBrowserChannel = make(chan command)
-var fromBrowserChannel = make(chan command)
-var connectChannel = make(chan command)
-var debuggerMutex = sync.Mutex{}
+	currentWebsocket   *websocket.Conn
+	toBrowserChannel   = make(chan command)
+	fromBrowserChannel = make(chan command)
+	connectChannel     = make(chan command)
+	debuggerMutex      = sync.Mutex{}
+)
 
 func init() {
 	// check any command line params. (needed when programs do not call flag.Parse() )
 	for i, arg := range os.Args {
-		if strings.HasPrefix(arg, "-hopwatch") {
+		if strings.HasPrefix(arg, "-hopwatch=") {
 			if strings.HasSuffix(arg, "false") {
 				log.Printf("[hopwatch] disabled.\n")
 				hopwatchEnabled = false
@@ -140,7 +142,6 @@ func connectHandler(ws *websocket.Conn) {
 		log.Printf("[hopwatch] already connected to a debugger; Ignore this\n")
 		return
 	}
-	log.Printf("[hopwatch] begin accepting commands ...\n")
 	// remember the connection for the sendLoop	
 	currentWebsocket = ws
 	var cmd command
@@ -151,7 +152,6 @@ func connectHandler(ws *websocket.Conn) {
 		connectChannel <- cmd
 		receiveLoop()
 	}
-	log.Printf("[hopwatch] end accepting commands.\n")
 }
 
 // receiveLoop reads commands from the websocket and puts them onto a channel.
