@@ -47,7 +47,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 	}
 	div#page,
 	div#topbar > .wide {
-		width: auto;
+		width: 100%;
 	}	
 	
 	div#menu {
