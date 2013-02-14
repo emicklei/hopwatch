@@ -31,7 +31,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function onOpen(evt) {
 		connected = true;
 		document.getElementById("disconnect").className = "buttonEnabled";
-		writeToScreen("<-> connected","info");		
+		writeToScreen("<-> connected","info mono");		
 		sendConnected();
 	}
 	function onClose(evt) {
@@ -44,12 +44,12 @@ func js(w http.ResponseWriter, req *http.Request) {
             console.log('[hopwatch] failed to read valid JSON: ', message.data);
             return;
         }		
-        console.log("[hopwatch] received: " + evt.data);
+        // console.log("[hopwatch] received: " + evt.data);
         if (cmd.Action == "display") {
         	var tr = document.createElement("tr");
         	addTime(tr);
         	addGoline(tr,cmd);
-        	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch");
+        	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch mono");
         	output.appendChild(tr);
         	sendResume();
         	return;
@@ -58,7 +58,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         	var tr = document.createElement("tr");
         	addTime(tr);
         	addGoline(tr,cmd);
-        	addMessage(tr,cmd.Parameters["line"],"watch");
+        	addMessage(tr,cmd.Parameters["line"],"watch mono");
         	output.appendChild(tr);
         	sendResume();
         	return;
@@ -69,7 +69,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         }				        				
 	}
 	function onError(evt) {
-		writeToScreen(evt,"err");
+		writeToScreen(evt,"err mono");
 	}
 	function handleSuspended(cmd) {
         suspended = true;
@@ -77,7 +77,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         var tr = document.createElement("tr");
        	addTime(tr);
        	addGoline(tr,cmd);
-       	var td = addMessage(tr,"--> program suspended", "suspend");
+       	var td = addMessage(tr,"--> program suspended", "suspend mono");
        	         addStack(td,cmd);       	
        	output.appendChild(tr);        
 	}	
@@ -91,7 +91,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function addTime(tr) {
 		var stamp = document.createElement("td");
 		stamp.innerHTML = timeHHMMSS();
-		stamp.className = "time"
+		stamp.className = "time mono"
 		tr.appendChild(stamp);			
 	}	
 	function addMessage(tr,msg,msgcls) {
@@ -112,7 +112,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		
 		var link = document.createElement("a");
 		link.href = "#";
-		link.className = "goline";
+		link.className = "goline mono";
 		link.onclick = function() { loadSource(cmd.Parameters["go.file"]); };
 		link.innerHTML = goline(cmd.Parameters);
 		where.appendChild(link);
@@ -148,7 +148,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		stk.style.display = "none";
 		var lines = document.createElement("pre");
 		lines.innerHTML = stack	
-		lines.className = "stack"			
+		lines.className = "stack mono"			
 		stk.appendChild(lines)		
 		td.appendChild(stk)	
 	}
@@ -184,7 +184,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		if (!suspended) return;
 		suspended = false;
 		document.getElementById("resume").className = "buttonDisabled";
-		// writeToScreen("<-- resume program","info");
+		// writeToScreen("<-- resume program","info mono");
 		sendResume();
 	}
 	function actionDisconnect() {
@@ -192,14 +192,14 @@ func js(w http.ResponseWriter, req *http.Request) {
 		connected = false;
 		document.getElementById("disconnect").className = "buttonDisabled";
 		sendQuit();
-		writeToScreen("<-- disconnect requested","info");
+		writeToScreen("<-- disconnect requested","info mono");
 		websocket.close();  // seems not to trigger close on Go-side ; so handleDisconnected cannot be used here
 	}
 	function handleDisconnected() {
 		connected = false;
 		document.getElementById("resume").className = "buttonDisabled";
 		document.getElementById("disconnect").className = "buttonDisabled";
-		writeToScreen(">-< disconnected","info");	
+		writeToScreen(">-< disconnected","info mono");	
 	}
 	function timeHHMMSS()    { return new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"); }
 	function sendConnected() { doSend('{"Action":"connected"}'); }

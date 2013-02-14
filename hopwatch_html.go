@@ -36,8 +36,14 @@ func html(w http.ResponseWriter, req *http.Request) {
 		<div id="log-pane">
 			<table id="output"></table>
 		</div>		
-		<div id="gosource-pane" title="somefile.go">
+		<div id="gosource-pane">
 			<div id="gofile">somefile.go</div>
+			<div id="nrs" class="mono">
+				<div>1</div>
+				<div>2</div>
+				<div>3</div>
+				<div>4</div>
+			</div>			
 			<pre id="gosource">
 				loading go source...
 			</pre>

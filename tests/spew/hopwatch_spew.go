@@ -15,5 +15,5 @@ func main() {
 
 	// uses go-spew, see https://github.com/davecgh/go-spew
 	hopwatch.Dump(tree)
-	hopwatch.Dumpf("kids %#+v",tree.children)
+	hopwatch.Dumpf("kids %#+v",tree.children).Break()
 }
