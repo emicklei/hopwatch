@@ -145,7 +145,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		$("#gosource").text(responseText);            
 	}
 	function shortenFileName(fileName) {
-		return fileName.length > 64 ? "..." + fileName.substring(fileName.length - 64) : fileName;
+		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
 	}
 	function addStack(td,cmd) {
 		var stack = cmd.Parameters["go.stack"];

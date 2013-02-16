@@ -37,7 +37,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 			<table id="output"></table>
 		</div>		
 		<div id="gosource-pane">
-			<div id="gofile" class="mono">somefile.go</div>
+			<div id="gofile" class="mono ">somefile.go</div>
 			<div id="nrs" class="mono"></div>
 			<div id="gosource" class="mono">
 				loading go source...

@@ -142,7 +142,8 @@ func css(w http.ResponseWriter, req *http.Request) {
 		float:			left;
 	}
 	#gofile {
-		
+		background-color:#FFF;
+		color:#375EAB;
 	}		
 	`)
 	return

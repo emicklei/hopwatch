@@ -13,8 +13,8 @@ func main() {
 	illegalOffset()
 }
 func inside() {
-	hopwatch.Display("15",15)
-	hopwatch.Display("16",16).Break()
+	hopwatch.Display("16",16)
+	hopwatch.Display("17",17).Break()
 }
 func indirectDisplay(args ...interface{}) {
 	hopwatch.CallerOffset(2).Display(args...)

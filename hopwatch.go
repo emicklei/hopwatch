@@ -34,15 +34,17 @@ func (self *command) addParam(key, value string) {
 }
 
 var (
-	hopwatchHostParam = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
-	hopwatchPortParam = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
-	hopwatchParam     = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
-	hopwatchOpenParam = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
+	hopwatchHostParam  = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
+	hopwatchPortParam  = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
+	hopwatchParam      = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
+	hopwatchOpenParam  = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
+	hopwatchBreakParam = flag.Bool("hopwatch.break", true, "do not suspend the program is Break(..) is called")
 
-	hopwatchEnabled           = true
-	hopwatchOpenEnabled       = true
-	hopwatchHost              = "localhost"
-	hopwatchPort        int64 = 23456
+	hopwatchEnabled            = true
+	hopwatchOpenEnabled        = true
+	hopwatchBreakEnabled       = true
+	hopwatchHost               = "localhost"
+	hopwatchPort         int64 = 23456
 
 	currentWebsocket   *websocket.Conn
 	toBrowserChannel   = make(chan command)
@@ -65,6 +67,12 @@ func init() {
 			if strings.HasSuffix(arg, "false") {
 				log.Printf("[hopwatch] auto open debugger disabled.\n")
 				hopwatchOpenEnabled = false
+			}
+		}
+		if strings.HasPrefix(arg, "-hopwatch.break") {
+			if strings.HasSuffix(arg, "false") {
+				log.Printf("[hopwatch] suspend on Break(..) disabled.\n")
+				hopwatchBreakEnabled = false
 			}
 		}
 		if strings.HasPrefix(arg, "-hopwatch.host") {
@@ -298,7 +306,11 @@ func (self Watchpoint) Break(conditions ...bool) {
 
 // suspend will create a new Command and send it to the browser.
 // callerOffset controls from which stackframe the go source file and linenumber must be read.
+// Ignore if option hopwatch.break=false
 func suspend(callerOffset int, conditions ...bool) {
+	if !hopwatchBreakEnabled {
+		return
+	}
 	for _, condition := range conditions {
 		if !condition {
 			return

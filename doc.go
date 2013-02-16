@@ -40,18 +40,17 @@ Other examples:
 	// print any formatted string ; no program suspend
 	hopwatch.Printf("result=%v", result)
 
-Integration with https://github.com/davecgh/go-spew (go-spew)
+Integration with https://github.com/davecgh/go-spew
 
-	// uses go-spew Dump
 	hopwatch.Dump(myVar1, myVar2)
 
-	// uses go-spew Printf
 	hopwatch.Dumpf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
 
 The flags are:
 
-	-hopwatch		if set to false then hopwatch is disabled.
+	-hopwatch	if set to false then hopwatch is disabled.
 	-hopwatch.open	if set to false then hopwatch will not try to open the debugger page on startup.
+	-hopwatch.break	if set to false then hopwatch will not suspend the program when Break(..) is called.
 	-hopwatch.host	tcp hostname of the listener address (default = localhost).
 	-hopwatch.port	tcp port of the listener address (default = 23456).
 
