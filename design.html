@@ -5,26 +5,44 @@
 	</head>
 	<body>
 		<style>   
-			body {
-				/* height:100%; */
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+			#header, #container, #log-pane, #source-pane, #footer {
+				position:absolute;
 			}
 			div#header {
+				top: 0;
 				background: #E0EBF5;
-				height: 64px;   
+				height: 64px; 
+				width: 100%;  
 			}     
 			div#container {
+				top: 64px;
+				bottom:64px;
+				width: 100%;
 			}
 			div#log-pane {  				
-				background: #F0F432;																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
-				float:left; 
-				width:60%;    
 				height:100%;
+				width:60%;    
 				white-space:pre;
-				overflow:auto;
+				background: #F0F432; 
+				overflow: auto;
 			}
 			div#source-pane {
+				height:100%;
+				left: 60%;
+				right: 0px;
+				overflow: auto;
+				white-space:pre;
 				background: #A0C120;  
-				white-space:pre
+			}
+			div#footer {
+				bottom: 0;
+				height: 64px;
+				width: 100%;  				
+				background: #B0A1FF;  				
 			}
 		</style>
 		<div id="header" >Header</div>
@@ -99,6 +117,9 @@
 				-rw-r--r--  1 emicklei  staff    692 Feb  8 16:41 spew.go
 				drwxr-xr-x  7 emicklei  staff    238 Feb 15 16:55 tests			
 			</div>
-		<div id="footer" />
+		</div>
+		<div id="footer">
+			Footer
+		</div>
 	</body>
 </html>

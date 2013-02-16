@@ -12,15 +12,22 @@ import (
 func css(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/css")
 	io.WriteString(w, `
-	body {
+	body, html {
 		margin: 0;
+		padding: 0;
 		font-family: Helvetica, Arial, sans-serif;
 		font-size: 16px;
 		color: #222;		
 	}
-	td { vertical-align:top }
-	a { text-decoration:none; color: #375EAB; }
-	a:hover { text-decoration:underline ; color:black }
+	.mono    {font-family:"Lucida Console", Monaco, monospace;font-size:small;}
+	
+	#heading, #footer, #page, #log-pane, #gosource-pane {
+		position:absolute;
+	}
+	
+	/******************
+	 * Heading
+	 */	
 	div#heading {
 		float: left;
 		margin: 0 0 10px 0;
@@ -35,21 +42,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 	div#topbar {
 		background: #E0EBF5;
 		height: 64px;
-	}
-	div#page,
-	div#topbar > .container {
-		clear: both;
-		text-align: left;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 0 20px;
-		width: 900px;
-	}
-	div#page,
-	div#topbar > .wide {
-		width: 100%;
 	}	
-	
 	div#menu {
 		float: left;
 		min-width: 590px;
@@ -79,19 +72,49 @@ func css(w http.ResponseWriter, req *http.Request) {
 		-moz-border-radius: 5px;
 		border-radius: 5px;
 	}
+	
+	/******************
+	 * Footer
+	 */	
 	div#footer {
+		bottom: 0;
+		height: 64px;
+		width: 100%;
+				
 		text-align: center;
 		color: #666;
 		font-size: 14px;
 		margin: 10px 0;
 	}
+	
+	/******************
+	 * Page
+	 */
+	div#page,
+	div#topbar > .container {
+		clear: both;
+		text-align: left;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 0 20px;
+		width: 900px;
+	}
+	div#page,
+	div#topbar > .wide {
+		width: 100%;
+	}	
 	div#page { float: left; }
-		div#log-pane { float:left; width: 60%; overflow: scroll; }
-		div#gofile { }
-		div#gosource-pane { margin-left: 60% ; display: none; background: #FFD; }
-		pre#gosource { font-size:small }
-		div#nrs { float:left; }
-	.mono    {font-family:"Lucida Console", Monaco, monospace;font-size:small;}
+		
+	/******************
+	 * Log
+	 */	
+	div#log-pane { 
+		float:left; width: 60%; overflow: scroll; 
+	}
+	td { vertical-align:top }
+	a { text-decoration:none; color: #375EAB; }
+	a:hover { text-decoration:underline ; color:black }
+
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {background-color:#FFD;border:1;padding:4px}
 	.time    {color:#AAA;white-space:nowrap}
@@ -99,6 +122,19 @@ func css(w http.ResponseWriter, req *http.Request) {
 	.goline  {color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {background-color:#FF3300;width:100%;}
 	.info 	 {width:100%;}
-	.suspend {}`) // http://jsfiddle.net/m4eS4/7/
+
+	/******************
+	 * Source
+	 */	
+	div#gosource-pane { 
+		margin-left: 60% ; 
+		display: none; 
+		background: #FFD; }
+	pre#gosource { 
+		font-size:small }
+	div#nrs { 
+		float:left; }
+		
+	`)
 	return
 }
