@@ -51,6 +51,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         	addGoline(tr,cmd);
         	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch mono");
         	output.appendChild(tr);
+        	tr.scrollIntoView();
         	sendResume();
         	return;
         }
@@ -79,7 +80,9 @@ func js(w http.ResponseWriter, req *http.Request) {
        	addGoline(tr,cmd);
        	var td = addMessage(tr,"--> program suspended", "suspend mono");
        	         addStack(td,cmd);       	
-       	output.appendChild(tr);        
+       	output.appendChild(tr); 
+		tr.scrollIntoView();       	
+       	loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);       
 	}	
 	function writeToScreen(text,cls) {
 		var tr = document.createElement("tr");
@@ -108,27 +111,41 @@ func js(w http.ResponseWriter, req *http.Request) {
 		tr.appendChild(empt);
 	}
 	function addGoline(tr,cmd) {
-		var where = document.createElement("td");
-		
+		var where = document.createElement("td");		
 		var link = document.createElement("a");
 		link.href = "#";
 		link.className = "goline mono";
-		link.onclick = function() { loadSource(cmd.Parameters["go.file"]); };
+		link.onclick = function() { 
+			loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]); 
+		};
 		link.innerHTML = goline(cmd.Parameters);
 		where.appendChild(link);
-
-//		where.className = "goline";
-//		where.innerHTML = goline(cmd.Parameters);
-		
 		tr.appendChild(where);
 	}
-	function loadSource(fileName) {
+	function loadSource(fileName, nr) {
 		$("#gofile").html(shortenFileName(fileName));
 		$("#gosource-pane").show();
-		$("#gosource").load("/gosource?file="+fileName);
+		$("#gosource").load("/gosource?file="+fileName, function(responseText,status,xhr) {
+			handleSourceLoaded(responseText,nr);
+			}
+		);
+	}
+	function handleSourceLoaded(responseText,line) {
+		var nrs = $("#nrs");		
+		nrs.empty();
+		// Insert line numbers		
+		var arr = responseText.split('\n');		
+        for (var i = 0; i < arr.length; i++) {
+        	var nr = i+1;        	
+        	var elm = document.createElement("div");
+        	elm.innerHTML = nr;
+        	if (line == nr) elm.className = "break"; 
+        	nrs.append(elm)
+        }
+		$("#gosource").text(responseText);            
 	}
 	function shortenFileName(fileName) {
-		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
+		return fileName.length > 64 ? "..." + fileName.substring(fileName.length - 64) : fileName;
 	}
 	function addStack(td,cmd) {
 		var stack = cmd.Parameters["go.stack"];
@@ -141,7 +158,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		toggle.href = "#";
 		toggle.className = "toggle";
 		toggle.onclick = function() { toggleStack(toggle); };
-		toggle.innerHTML="stack";
+		toggle.innerHTML="stack &#x25B6;";
 		td.appendChild(toggle);
 		
 		var stk = document.createElement("div");
@@ -154,7 +171,14 @@ func js(w http.ResponseWriter, req *http.Request) {
 	}
 	function toggleStack(link) {
 		var stack = link.nextSibling;
-		stack.style.display = (stack.style.display == "none") ? "block" : "none";
+		if (stack.style.display == "none") {	
+			link.innerHTML = "stack &#x25BC;";	
+			stack.style.display = "block"
+			stack.scrollIntoView();
+		} else {		
+			link.innerHTML = "stack &#x25B6;";
+			stack.style.display = "none";
+		}
 	}	
 	// http://www.quirksmode.org/js/keys.html
 	function handleKeyDown(event) {

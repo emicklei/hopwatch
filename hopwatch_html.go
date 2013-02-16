@@ -20,7 +20,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 	<script type="text/javascript" src="hopwatch.js" ></script>
 </head>
 <body>
-	<div id="topbar">
+	<div id="header">
 		<div class="container wide">
 			<div id="heading">
 				<a href="/hopwatch.html">Hopwatch - debugging tool</a>
@@ -32,24 +32,19 @@ func html(w http.ResponseWriter, req *http.Request) {
 			</div>
 		</div>
 	</div>
-	<div id="page" class="wide">
+	<div id="content">
 		<div id="log-pane">
 			<table id="output"></table>
 		</div>		
 		<div id="gosource-pane">
-			<div id="gofile">somefile.go</div>
-			<div id="nrs" class="mono">
-				<div>1</div>
-				<div>2</div>
-				<div>3</div>
-				<div>4</div>
-			</div>			
-			<pre id="gosource">
+			<div id="gofile" class="mono">somefile.go</div>
+			<div id="nrs" class="mono"></div>
+			<div id="gosource" class="mono">
 				loading go source...
-			</pre>
+			</div>
 		</div>
 	</div>
-	<div id="footer" style="float:left; width:100%">
+	<div id="footer">
 		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch" target="_blank">hopwatch on github.com</a>
 	</div>
 </body>

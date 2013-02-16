@@ -20,8 +20,9 @@ func css(w http.ResponseWriter, req *http.Request) {
 		color: #222;		
 	}
 	.mono    {font-family:"Lucida Console", Monaco, monospace;font-size:small;}
+	.wide    {width:100%;}
 	
-	#heading, #footer, #page, #log-pane, #gosource-pane {
+	#header, #content, #footer, #log-pane, #gosource-pane {
 		position:absolute;
 	}
 	
@@ -39,10 +40,14 @@ func css(w http.ResponseWriter, req *http.Request) {
 		color: #222;
 		text-decoration: none;
 	}	
-	div#topbar {
+	div#header {
 		background: #E0EBF5;
-		height: 64px;
+		height: 	64px;
+		width:		100%;
 	}	
+	.container {
+		padding: 	0 20px;
+	}
 	div#menu {
 		float: left;
 		min-width: 590px;
@@ -78,38 +83,30 @@ func css(w http.ResponseWriter, req *http.Request) {
 	 */	
 	div#footer {
 		bottom: 0;
-		height: 64px;
+		height: 24px;
 		width: 100%;
 				
 		text-align: center;
 		color: #666;
 		font-size: 14px;
-		margin: 10px 0;
 	}
 	
 	/******************
-	 * Page
+	 * Content
 	 */
-	div#page,
-	div#topbar > .container {
-		clear: both;
-		text-align: left;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 0 20px;
-		width: 900px;
+	#content {
+		top: 	64px;
+		bottom: 24px;
+		width:	100%;
 	}
-	div#page,
-	div#topbar > .wide {
-		width: 100%;
-	}	
-	div#page { float: left; }
 		
 	/******************
 	 * Log
 	 */	
-	div#log-pane { 
-		float:left; width: 60%; overflow: scroll; 
+	#log-pane { 
+		height: 100%;
+		width: 60%; 
+		overflow: auto; 
 	}
 	td { vertical-align:top }
 	a { text-decoration:none; color: #375EAB; }
@@ -122,19 +119,31 @@ func css(w http.ResponseWriter, req *http.Request) {
 	.goline  {color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {background-color:#FF3300;width:100%;}
 	.info 	 {width:100%;}
+	.break   {background-color:#375EAB;color:#FFF;}
 
 	/******************
 	 * Source
 	 */	
-	div#gosource-pane { 
-		margin-left: 60% ; 
+	#gosource-pane { 
+		height: 100%;
+		left: 60% ;
+		right: 0px; 
 		display: none; 
-		background: #FFD; }
-	pre#gosource { 
-		font-size:small }
-	div#nrs { 
-		float:left; }
+		margin: 0;
+	}
+	#gosource {
+		margin: 		0;
+		overflow: 		auto;
+		background: 	#FFD;
+		white-space:	pre; 		
+	}
+	#nrs { 
+		width:			20px;
+		float:			left;
+	}
+	#gofile {
 		
+	}		
 	`)
 	return
 }
