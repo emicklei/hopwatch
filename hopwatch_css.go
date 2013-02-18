@@ -130,10 +130,10 @@ func css(w http.ResponseWriter, req *http.Request) {
 		right: 0px; 
 		display: none; 
 		margin: 0;
+		overflow: auto;
 	}
 	#gosource {
 		margin: 		0;
-		overflow: 		auto;
 		background: 	#FFD;
 		white-space:	pre; 		
 	}

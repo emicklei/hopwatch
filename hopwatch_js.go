@@ -134,15 +134,20 @@ func js(w http.ResponseWriter, req *http.Request) {
 		var nrs = $("#nrs");		
 		nrs.empty();
 		// Insert line numbers		
-		var arr = responseText.split('\n');		
+		var arr = responseText.split('\n');
+		var breakElm;		
         for (var i = 0; i < arr.length; i++) {
         	var nr = i+1;        	
         	var elm = document.createElement("div");
         	elm.innerHTML = nr;
-        	if (line == nr) elm.className = "break"; 
+        	if (line == nr) {
+        		elm.className = "break";
+        		breakElm = elm;
+        	} 
         	nrs.append(elm)
         }
-		$("#gosource").text(responseText);            
+		$("#gosource").text(responseText);
+		breakElm.scrollIntoView();            
 	}
 	function shortenFileName(fileName) {
 		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
