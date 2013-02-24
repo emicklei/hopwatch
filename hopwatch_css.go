@@ -138,7 +138,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 		white-space:	pre; 		
 	}
 	#nrs { 
-		width:			20px;
+		width:			24px;
 		float:			left;
 	}
 	#gofile {
