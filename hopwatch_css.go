@@ -108,10 +108,10 @@ func css(w http.ResponseWriter, req *http.Request) {
 		width: 60%; 
 		overflow: auto; 
 	}
-	td { vertical-align:top }
 	a { text-decoration:none; color: #375EAB; }
 	a:hover { text-decoration:underline ; color:black }
-
+                 
+    .logline {}
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {background-color:#FFD;border:1;padding:4px}
 	.time    {color:#AAA;white-space:nowrap}

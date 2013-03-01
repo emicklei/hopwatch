@@ -34,7 +34,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 	</div>
 	<div id="content">
 		<div id="log-pane">
-			<table id="output"></table>
+			<div id="output"></div>
 		</div>		
 		<div id="gosource-pane">
 			<div id="gofile" class="mono ">somefile.go</div>

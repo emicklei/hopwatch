@@ -46,21 +46,23 @@ func js(w http.ResponseWriter, req *http.Request) {
         }		
         // console.log("[hopwatch] received: " + evt.data);
         if (cmd.Action == "display") {
-        	var tr = document.createElement("tr");
-        	addTime(tr);
-        	addGoline(tr,cmd);
-        	addMessage(tr,watchParametersToHtml(cmd.Parameters),"watch mono");
-        	output.appendChild(tr);
-        	tr.scrollIntoView();
+        	var logdiv = document.createElement("div");
+			logdiv.className = "logline";
+        	addTime(logdiv);
+        	addGoline(logdiv,cmd);
+        	addMessage(logdiv,watchParametersToHtml(cmd.Parameters),"watch mono");
+        	output.appendChild(logdiv);
+        	logdiv.scrollIntoView();
         	sendResume();
         	return;
         }
         if (cmd.Action == "print") {
-        	var tr = document.createElement("tr");
-        	addTime(tr);
-        	addGoline(tr,cmd);
-        	addMessage(tr,cmd.Parameters["line"],"watch mono");
-        	output.appendChild(tr);
+        	var logdiv = document.createElement("div");  
+			logdiv.className = "logline";
+        	addTime(logdiv);
+        	addGoline(logdiv,cmd);
+        	addMessage(logdiv,cmd.Parameters["line"],"watch mono");
+        	output.appendChild(logdiv);
         	sendResume();
         	return;
         }        
@@ -75,43 +77,45 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function handleSuspended(cmd) {
         suspended = true;
         document.getElementById("resume").className = "buttonEnabled";
-        var tr = document.createElement("tr");
-       	addTime(tr);
-       	addGoline(tr,cmd);
-       	var td = addMessage(tr,"--> program suspended", "suspend mono");
-       	         addStack(td,cmd);       	
-       	output.appendChild(tr); 
-		tr.scrollIntoView();       	
+        var logdiv = document.createElement("div"); 
+		logdiv.className = "logline";
+       	addTime(logdiv);
+       	addGoline(logdiv,cmd);
+       	var celldiv = addMessage(logdiv,"--> program suspended", "suspend mono");
+       	addStack(celldiv,cmd);       	
+       	output.appendChild(logdiv); 
+		logdiv.scrollIntoView();       	
        	loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);       
 	}	
 	function writeToScreen(text,cls) {
-		var tr = document.createElement("tr");
-		addTime(tr);
-		addEmptiness(tr);
-		addMessage(tr,text,cls)
-		output.appendChild(tr);
+		var logdiv = document.createElement("span"); 
+		logdiv.className = "logline";
+		addTime(logdiv);
+		addEmptiness(logdiv);
+		addMessage(logdiv,text,cls)
+		output.appendChild(logdiv);
 	}	
-	function addTime(tr) {
-		var stamp = document.createElement("td");
+	function addTime(logdiv) {
+		var stamp = document.createElement("span");
 		stamp.innerHTML = timeHHMMSS();
 		stamp.className = "time mono"
-		tr.appendChild(stamp);			
+		logdiv.appendChild(stamp);			
 	}	
-	function addMessage(tr,msg,msgcls) {
-		var txt = document.createElement("td");
+	function addMessage(logdiv,msg,msgcls) {
+		var txt = document.createElement("span");
 		txt.className = msgcls		
 		txt.innerHTML = msg;
-		tr.appendChild(txt);
+		logdiv.appendChild(txt);
 		return txt;
 	}
-	function addEmptiness(tr) {
-		var empt = document.createElement("td");
+	function addEmptiness(logdiv) {
+		var empt = document.createElement("span");
 		empt.className = "goline"		
 		empt.innerHTML = "&nbsp;";
-		tr.appendChild(empt);
+		logdiv.appendChild(empt);
 	}
-	function addGoline(tr,cmd) {
-		var where = document.createElement("td");		
+	function addGoline(logdiv,cmd) {
+		var where = document.createElement("span");		
 		var link = document.createElement("a");
 		link.href = "#";
 		link.className = "goline mono";
@@ -120,7 +124,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		};
 		link.innerHTML = goline(cmd.Parameters);
 		where.appendChild(link);
-		tr.appendChild(where);
+		logdiv.appendChild(where);
 	}
 	function loadSource(fileName, nr) {
 		$("#gofile").html(shortenFileName(fileName));
@@ -152,19 +156,19 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function shortenFileName(fileName) {
 		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
 	}
-	function addStack(td,cmd) {
+	function addStack(celldiv,cmd) {
 		var stack = cmd.Parameters["go.stack"];
 		if (stack != null && stack.length > 0) {
-			addNonEmptyStackTo(stack,td);
+			addNonEmptyStackTo(stack,celldiv);
 		}	
 	}	
-	function addNonEmptyStackTo(stack,td) {
+	function addNonEmptyStackTo(stack,celldiv) {
 		var toggle = document.createElement("a");
 		toggle.href = "#";
 		toggle.className = "toggle";
 		toggle.onclick = function() { toggleStack(toggle); };
 		toggle.innerHTML="stack &#x25B6;";
-		td.appendChild(toggle);
+		celldiv.appendChild(toggle);
 		
 		var stk = document.createElement("div");
 		stk.style.display = "none";
@@ -172,7 +176,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		lines.innerHTML = stack	
 		lines.className = "stack mono"			
 		stk.appendChild(lines)		
-		td.appendChild(stk)	
+		celldiv.appendChild(stk)	
 	}
 	function toggleStack(link) {
 		var stack = link.nextSibling;
@@ -235,7 +239,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function sendResume()    { doSend('{"Action":"resume"}'); }
 	function sendQuit()      { doSend('{"Action":"quit"}'); }	
 	function doSend(message) {
-		// ^console.log("[hopwatch] send: " + message);
+		// console.log("[hopwatch] send: " + message);
 		websocket.send(message);
 	}
 	window.addEventListener("load", init, false);
