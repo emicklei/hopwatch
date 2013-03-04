@@ -40,7 +40,6 @@ func html(w http.ResponseWriter, req *http.Request) {
 			<div id="gofile" class="mono ">somefile.go</div>
 			<div id="nrs" class="mono"></div>
 			<div id="gosource" class="mono">
-				loading go source...
 			</div>
 		</div>
 	</div>

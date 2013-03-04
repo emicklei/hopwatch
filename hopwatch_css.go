@@ -19,7 +19,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 		font-size: 16px;
 		color: #222;		
 	}
-	.mono    {font-family:"Lucida Console", Monaco, monospace;font-size:small;}
+	.mono    {font-family:"Lucida Console", Monaco, monospace;font-size:13px;}
 	.wide    {width:100%;}
 	
 	#header, #content, #footer, #log-pane, #gosource-pane {
@@ -114,17 +114,17 @@ func css(w http.ResponseWriter, req *http.Request) {
 	a { text-decoration:none; color: #375EAB; }
 	a:hover { text-decoration:underline ; color:black }
                  
-	.logline {display:row}
-    .srcline {display:table-cell;}
+	.logline {}
+    .srcline {}
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {background-color:#FFD;border:1;padding:4px}
-	.time    {display:table-cell;color:#AAA;white-space:nowrap}
-	.watch 	 {display:table-cell;width:100%;white-space:pre}
-	.goline  {display:table-cell;color:#888;padding-left:8px;padding-right:8px;}
+	.time    {color:#AAA;white-space:nowrap}
+	.watch 	 {width:100%;white-space:pre}
+	.goline  {color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {background-color:#FF3300;width:100%;}
-	.info 	 {display:table-cell;width:100%;}
+	.info 	 {width:100%;}
 	.break   {background-color:#375EAB;color:#FFF;}
-	.suspend {display:table-cell;}
+	.suspend {}
 
 	/******************
 	 * Source

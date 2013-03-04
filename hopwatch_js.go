@@ -17,6 +17,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 	var websocket = new WebSocket(wsUri);	
 	var connected = false;
 	var suspended = false;
+	var golineSize = 18;
 	
 	function init() {
 		output = document.getElementById("output");
@@ -130,29 +131,39 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function loadSource(fileName, nr) {
 		$("#gofile").html(shortenFileName(fileName));
 		$("#gosource-pane").show();
-		$("#gosource").load("/gosource?file="+fileName, function(responseText,status,xhr) {
-			handleSourceLoaded(responseText,nr);
+		$.ajax({
+			url:"/gosource?file="+fileName
+		}).done(
+			function(responseText,status,xhr) {
+				handleSourceLoaded(responseText,nr);
 			}
 		);
 	}
 	function handleSourceLoaded(responseText,line) {
-		var nrs = $("#nrs");		
-		nrs.empty();
+		gosource = $("#gosource");
+		gosource.empty();
+		var breakElm
 		// Insert line numbers		
-		var arr = responseText.split('\n');
-		var breakElm;		
-        for (var i = 0; i < arr.length; i++) {
-        	var nr = i+1;        	
+		var arr = responseText.split('\n');		
+        for (var i = 0; i < arr.length; i++) {  
+	   		var nr = i + 1
+			var buf = space_padded(nr) + arr[i];
         	var elm = document.createElement("div");
-        	elm.innerHTML = nr;
+        	elm.innerHTML = buf;
         	if (line == nr) {
         		elm.className = "break";
-        		breakElm = elm;
+				breakElm = elm
         	} 
-        	nrs.append(elm)
-        }
-		$("#gosource").text(responseText);
+        	gosource.append(elm)
+        }		
 		breakElm.scrollIntoView();            
+	}
+	function space_padded(i) {
+		var buf = "" + i
+		if (i<1000) { buf += " " }
+		if (i<100) { buf += " " }
+		if (i<10) { buf += " " }
+		return buf		
 	}
 	function shortenFileName(fileName) {
 		return fileName.length > 48 ? "..." + fileName.substring(fileName.length - 48) : fileName;
@@ -211,7 +222,12 @@ func js(w http.ResponseWriter, req *http.Request) {
 	function goline(parameters) { 
 		var f = parameters["go.file"]
 		f = f.substr(f.lastIndexOf("/")+1)
-		return f + ":" + parameters["go.line"]
+		var padded = f + ":" + parameters["go.line"]
+		while (padded.length > golineSize) {
+			golineSize += 4
+		}
+		for (i=padded.length;i<golineSize;i++) padded += "&nbsp;"
+		return padded
 	}
 	function actionResume() {
 		if (!connected) return;
