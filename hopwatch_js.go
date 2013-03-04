@@ -47,7 +47,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         // console.log("[hopwatch] received: " + evt.data);
         if (cmd.Action == "display") {
         	var logdiv = document.createElement("div");
-			logdiv.className = "logline";
+			logdiv.className = "logline"
         	addTime(logdiv);
         	addGoline(logdiv,cmd);
         	addMessage(logdiv,watchParametersToHtml(cmd.Parameters),"watch mono");
@@ -57,8 +57,8 @@ func js(w http.ResponseWriter, req *http.Request) {
         	return;
         }
         if (cmd.Action == "print") {
-        	var logdiv = document.createElement("div");  
-			logdiv.className = "logline";
+        	var logdiv = document.createElement("div"); 
+			logdiv.className = "logline"
         	addTime(logdiv);
         	addGoline(logdiv,cmd);
         	addMessage(logdiv,cmd.Parameters["line"],"watch mono");
@@ -78,7 +78,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         suspended = true;
         document.getElementById("resume").className = "buttonEnabled";
         var logdiv = document.createElement("div"); 
-		logdiv.className = "logline";
+		logdiv.className = "logline"
        	addTime(logdiv);
        	addGoline(logdiv,cmd);
        	var celldiv = addMessage(logdiv,"--> program suspended", "suspend mono");
@@ -88,8 +88,8 @@ func js(w http.ResponseWriter, req *http.Request) {
        	loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);       
 	}	
 	function writeToScreen(text,cls) {
-		var logdiv = document.createElement("span"); 
-		logdiv.className = "logline";
+		var logdiv = document.createElement("div"); 
+		logdiv.className = "logline"	
 		addTime(logdiv);
 		addEmptiness(logdiv);
 		addMessage(logdiv,text,cls)
@@ -115,7 +115,8 @@ func js(w http.ResponseWriter, req *http.Request) {
 		logdiv.appendChild(empt);
 	}
 	function addGoline(logdiv,cmd) {
-		var where = document.createElement("span");		
+		var where = document.createElement("span");
+		where.className = "srcline"		
 		var link = document.createElement("a");
 		link.href = "#";
 		link.className = "goline mono";

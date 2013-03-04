@@ -97,12 +97,15 @@ func css(w http.ResponseWriter, req *http.Request) {
 	#content {
 		top: 	64px;
 		bottom: 24px;
-		width:	100%;
+		width:	100%;		
 	}
 		
 	/******************
 	 * Log
 	 */	
+	#output {
+		display: table;
+	}
 	#log-pane { 
 		height: 100%;
 		width: 60%; 
@@ -111,15 +114,17 @@ func css(w http.ResponseWriter, req *http.Request) {
 	a { text-decoration:none; color: #375EAB; }
 	a:hover { text-decoration:underline ; color:black }
                  
-    .logline {}
+	.logline {display:row}
+    .srcline {display:table-cell;}
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
 	.stack   {background-color:#FFD;border:1;padding:4px}
-	.time    {color:#AAA;white-space:nowrap}
-	.watch 	 {width:100%;white-space:pre}
-	.goline  {color:#888;padding-left:8px;padding-right:8px;}
+	.time    {display:table-cell;color:#AAA;white-space:nowrap}
+	.watch 	 {display:table-cell;width:100%;white-space:pre}
+	.goline  {display:table-cell;color:#888;padding-left:8px;padding-right:8px;}
 	.err 	 {background-color:#FF3300;width:100%;}
-	.info 	 {width:100%;}
+	.info 	 {display:table-cell;width:100%;}
 	.break   {background-color:#375EAB;color:#FFF;}
+	.suspend {display:table-cell;}
 
 	/******************
 	 * Source
