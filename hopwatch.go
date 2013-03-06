@@ -124,7 +124,8 @@ func open(uri string) error {
 // serve a (source) file for displaying in the debugger
 func gosource(w http.ResponseWriter, req *http.Request) {
 	fileName := req.FormValue("file")
-	// should check for permission?
+	// should check for permission?  
+	w.Header().Set("Cache-control","no-store, no-cache, must-revalidate")
 	http.ServeFile(w, req, fileName)
 }
 

@@ -120,7 +120,7 @@ func css(w http.ResponseWriter, req *http.Request) {
 		border-width: 1px;
 		border-color: #ddd;
 		border-style: solid;
-		box-shadow: inset 0 6px 5px -5px rgba(0,0,0,0.4);
+		box-shadow: inset 0 4px 5px -5px rgba(0,0,0,0.4);
 		margin: 1px 6px 0;	
 	}
 	.time    {color:#AAA;white-space:nowrap}
