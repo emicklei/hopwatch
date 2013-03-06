@@ -103,9 +103,6 @@ func css(w http.ResponseWriter, req *http.Request) {
 	/******************
 	 * Log
 	 */	
-	#output {
-		display: table;
-	}
 	#log-pane { 
 		height: 100%;
 		width: 60%; 
@@ -117,7 +114,15 @@ func css(w http.ResponseWriter, req *http.Request) {
 	.logline {}
     .srcline {}
 	.toggle  {padding-left:4px;padding-right:4px;margin-left:4px;margin-right:4px;background-color:#375EAB;color:#FFF;}	
-	.stack   {background-color:#FFD;border:1;padding:4px}
+	.stack   {
+		background-color:#FFD;
+		padding: 4px;
+		border-width: 1px;
+		border-color: #ddd;
+		border-style: solid;
+		box-shadow: inset 0 6px 5px -5px rgba(0,0,0,0.4);
+		margin: 1px 6px 0;	
+	}
 	.time    {color:#AAA;white-space:nowrap}
 	.watch 	 {width:100%;white-space:pre}
 	.goline  {color:#888;padding-left:8px;padding-right:8px;}
