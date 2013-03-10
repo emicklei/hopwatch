@@ -64,6 +64,7 @@ func js(w http.ResponseWriter, req *http.Request) {
         	addGoline(logdiv,cmd);
         	addMessage(logdiv,cmd.Parameters["line"],"watch mono");
         	output.appendChild(logdiv);
+			logdiv.scrollIntoView();
         	sendResume();
         	return;
         }        
@@ -86,7 +87,10 @@ func js(w http.ResponseWriter, req *http.Request) {
        	addStack(celldiv,cmd);       	
        	output.appendChild(logdiv); 
 		logdiv.scrollIntoView();       	
-       	loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);       
+       	handleSourceUpdate(cmd);
+	}
+	func handleSourceUpdate(cmd) {
+		loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);
 	}	
 	function writeToScreen(text,cls) {
 		var logdiv = document.createElement("div"); 
@@ -104,10 +108,19 @@ func js(w http.ResponseWriter, req *http.Request) {
 	}	
 	function addMessage(logdiv,msg,msgcls) {
 		var txt = document.createElement("span");
-		txt.className = msgcls		
-		txt.innerHTML = msg;
+		txt.className = msgcls	
+		var escaped = "";
+		var arr = safe_tags(msg).split('\n');		
+		for (var i = 0; i < arr.length; i++) {	
+			if (i > 0) escaped += "\n"; 
+			escaped += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + arr[i]; // TODO remove hack
+		}
+		txt.innerHTML = escaped;
 		logdiv.appendChild(txt);
 		return txt;
+	}
+	function safe_tags(str) {
+	    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
 	}
 	function addEmptiness(logdiv) {
 		var empt = document.createElement("span");
