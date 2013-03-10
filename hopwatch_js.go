@@ -89,7 +89,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		logdiv.scrollIntoView();       	
        	handleSourceUpdate(cmd);
 	}
-	func handleSourceUpdate(cmd) {
+	function handleSourceUpdate(cmd) {
 		loadSource(cmd.Parameters["go.file"], cmd.Parameters["go.line"]);
 	}	
 	function writeToScreen(text,cls) {
@@ -97,7 +97,8 @@ func js(w http.ResponseWriter, req *http.Request) {
 		logdiv.className = "logline"	
 		addTime(logdiv);
 		addEmptiness(logdiv);
-		addMessage(logdiv,text,cls)
+		addMessage(logdiv,text,cls);
+		logdiv.scrollIntoView();
 		output.appendChild(logdiv);
 	}	
 	function addTime(logdiv) {
@@ -112,8 +113,8 @@ func js(w http.ResponseWriter, req *http.Request) {
 		var escaped = "";
 		var arr = safe_tags(msg).split('\n');		
 		for (var i = 0; i < arr.length; i++) {	
-			if (i > 0) escaped += "\n"; 
-			escaped += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + arr[i]; // TODO remove hack
+			if (i > 0) escaped += "\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"; // TODO remove hack
+			escaped += arr[i];
 		}
 		txt.innerHTML = escaped;
 		logdiv.appendChild(txt);
