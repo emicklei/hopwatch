@@ -1,0 +1,63 @@
+Hopwatch
+debugging tool for Go
+
+Ernest Micklei
+Software Architect, bol.com
+http://ernestmicklei.com
+
+* What is Hopwatch?
+
+Package and HTML5 + Javascript tool that allows you to follow the execution and state of your program.
+
+.image hopwatch_how.png
+
+* Simple, but...
+
+Need statements to control the debugger
+
+	
+	// Display the structure (value and types) of a variable
+	
+	hopwatch.Dump(yourVar)
+		
+	// Suspend the program and wait for Resume
+	
+	hopwatch.Break()	
+
+* Show me
+
+* Implementation details
+
+- Uses channels to synchronize Websocket communication
+	// receiveLoop reads commands from the websocket and puts them onto a channel.
+	func receiveLoop() { ... }
+	
+	// sendLoop takes commands from a channel to send to the browser (debugger).
+	func sendLoop() { ... }
+
+- HTML and Javascript source code wrapped in Go functions
+
+	func js(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "text/javascript")
+		io.WriteString(w, `
+		var wsUri = "ws://" + window.location.hostname + ":" + window.location.port + "/hopwatch";
+		...
+
+- Uses go-spew for dumping data structures
+
+* debug.go
+
+Control hopwatch behavior from one source file
+
+.code debug.go
+
+* Example
+
+.code try_debug.go
+
+.image try_debug.png
+
+* Future directions
+
+- Frontend for GDB ?
+- Watches on variables

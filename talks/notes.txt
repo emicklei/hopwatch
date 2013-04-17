@@ -1,0 +1,5 @@
+- Shows debug information in a browser while running a Go program
+
+- Can display any datastructure
+
+- Can suspend and resume the execution in any function

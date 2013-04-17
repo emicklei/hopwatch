@@ -7,13 +7,13 @@ import (
 
 // Dump delegates to spew.Fdump, see https://github.com/davecgh/go-spew
 func Dump(a ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset: 3}
+	wp := &Watchpoint{offset: 2}
 	return wp.Dump(a...)
 }
 
 // Dumpf delegates to spew.Fprintf, see https://github.com/davecgh/go-spew
 func Dumpf(format string, a ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset: 3}
+	wp := &Watchpoint{offset: 2}
 	return wp.Dumpf(format, a...)
 }
 
