@@ -5,12 +5,12 @@
 /*
 Hopwatch is a debugging tool for Go programs.  
 
-Hopwatch uses a HTML5 application to connect to your program (using a Websocket).
+Hopwatch uses a (embedded) HTML5 application to connect to your program (using a Websocket).
 Using Hopwatch requires adding function calls at points of interest that allow you to watch program state and suspend the program.
 On the Hopwatch page, you can view debug information (file:line,stack) and choose to resume the execution of your program.
 
-You can provide more debug information using the Display function which takes an arbitrary number of variable,value pairs.
-The Display function itself does not suspend the program ; it is like having logging information in the browser.
+You can provide more debug information using the Display and Dump functions which take an arbitrary number of variables.
+The Display and Dump functions do not suspend the program ; it is like having logging information in the browser.
 
 Usage:
 
@@ -26,10 +26,10 @@ Usage:
 
 Connect:
 
-	Open the Hopwatch debugger on http://localhost:23456/hopwatch.html after starting your program.
+	The Hopwatch debugger is automatically started on http://localhost:23456/hopwatch.html.
 	Your browser must support WebSockets. It has been tested with Chrome and Safari on a Mac.
 
-Other examples:
+Other code examples:
 
 	// zero or more conditions ; conditionally suspends program (or goroutine)
 	hopwatch.Break(i > 10,  j < 100)	
@@ -40,13 +40,13 @@ Other examples:
 	// print any formatted string ; no program suspend
 	hopwatch.Printf("result=%v", result)
 
-Integration with https://github.com/davecgh/go-spew
+	// display detailed (type, nesting) information using https://github.com/davecgh/go-spew
+	hopwatch.Dump(myVar1)
 
-	hopwatch.Dump(myVar1, myVar2)
-
+	// format and display detailed (type, nesting) information using https://github.com/davecgh/go-spew
 	hopwatch.Dumpf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
 
-The flags are:
+Flags:
 
 	-hopwatch	if set to false then hopwatch is disabled.
 	-hopwatch.open	if set to false then hopwatch will not try to open the debugger page on startup.
