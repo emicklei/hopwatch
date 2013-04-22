@@ -3,3 +3,9 @@
 - Can display any datastructure
 
 - Can suspend and resume the execution in any function
+
+
+* Future directions
+
+- Frontend for GDB ?
+- Watches on variables

@@ -35,10 +35,10 @@ func (self *command) addParam(key, value string) {
 
 var (
 	hopwatchHostParam  = flag.String("hopwatch.host", "localhost", "HTTP host the debugger is listening on")
-	hopwatchPortParam  = flag.Int("hopwatch.port", 2346, "HTTP port the debugger is listening on")
+	hopwatchPortParam  = flag.Int("hopwatch.port", 23456, "HTTP port the debugger is listening on")
 	hopwatchParam      = flag.Bool("hopwatch", true, "controls whether hopwatch agent is started")
 	hopwatchOpenParam  = flag.Bool("hopwatch.open", true, "controls whether a browser page is opened on the hopwatch page")
-	hopwatchBreakParam = flag.Bool("hopwatch.break", true, "do not suspend the program is Break(..) is called")
+	hopwatchBreakParam = flag.Bool("hopwatch.break", true, "do not suspend the program if Break(..) is called")
 
 	hopwatchEnabled            = true
 	hopwatchOpenEnabled        = true
@@ -125,7 +125,7 @@ func open(uri string) error {
 func gosource(w http.ResponseWriter, req *http.Request) {
 	fileName := req.FormValue("file")
 	// should check for permission?  
-	w.Header().Set("Cache-control","no-store, no-cache, must-revalidate")
+	w.Header().Set("Cache-control", "no-store, no-cache, must-revalidate")
 	http.ServeFile(w, req, fileName)
 }
 

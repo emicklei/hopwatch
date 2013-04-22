@@ -2,10 +2,11 @@ package main
 
 import "math"
 
-func main() {	
+func main() {
 	liveOfPi()
 }
 
 func liveOfPi() {
-	debug(true, math.Pi)
+	// display and break
+	watch(true, math.Pi)
 }

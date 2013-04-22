@@ -7,57 +7,147 @@ http://ernestmicklei.com
 
 * What is Hopwatch?
 
-Package and HTML5 + Javascript tool that allows you to follow the execution and state of your program.
+Simple tool that allows you to follow the *execution* and *state* of your program.
 
 .image hopwatch_how.png
 
-* Simple, but...
+Go package with embedded HTML5+Javascript to interact using a browser
 
-Need statements to control the debugger
+* API
 
-	
-	// Display the structure (value and types) of a variable
-	
-	hopwatch.Dump(yourVar)
-		
-	// Suspend the program and wait for Resume
+Suspend program until "Resume" in browser
 	
 	hopwatch.Break()	
+	
+Print a line, fmt-package style
+
+	hopwatch.Printf("var=%v", var)
+	
+Chain
+
+	hopwatch.Printf("a=%v",a).Break(a>0)
+	
+Dump for printing structs with type info (uses go-spew)
+
+	hopwatch.Dump(treeNode)	
 
 * Show me
 
-* Implementation details
+* Design
 
-- Uses channels to synchronize Websocket communication
-	// receiveLoop reads commands from the websocket and puts them onto a channel.
-	func receiveLoop() { ... }
+* Commands send to the browser
+
+	func sendLoop() {
+		if currentWebsocket == nil {
+			if "quit" == waitForAction() {
+				return
+			}
+		}
+		for {
+			next := <-toBrowserChannel
+			if "quit" == next.Action {
+				break
+			}
+			if currentWebsocket == nil {
+				if "quit" == waitForAction() {
+					break
+				}
+			}
+			websocket.JSON.Send(currentWebsocket, &next)
+		}
+	}
+
+
+
+
+* Commands received from the browser
+
+	func receiveLoop() {
+		for {
+			var cmd command
+			if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
+				log.Printf("[hopwatch] receiveLoop.JSON.Receive failed:%v", err)
+				fromBrowserChannel <- command{Action: "quit"}
+				break
+			}
+			if "quit" == cmd.Action {
+				hopwatchEnabled = false
+				log.Printf("[hopwatch] browser requests disconnect.\n")
+				fromBrowserChannel <- cmd
+				currentWebsocket.Close()
+				currentWebsocket = nil
+				break
+			} else {
+				fromBrowserChannel <- cmd
+			}
+		}
+	}
+
+
+
+
+
+* HTML and Javascript wrapped in Go 
+
+	func html(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w,
+			`<!DOCTYPE html>
+	<meta charset="utf-8" />
+	<title>Hopwatch Debugger</title>
+	<head>
+	...
+
+Route assets to functions
+
+	http.HandleFunc("/hopwatch.html", html)
+	http.HandleFunc("/hopwatch.css", css)
+	http.HandleFunc("/hopwatch.js", js)
+
+Hopwatch is self-contained; no need to setup path for static content
+
+
+* Flags to override defaults
+
+controls whether hopwatch agent is started
+
+	-hopwatch=true
 	
-	// sendLoop takes commands from a channel to send to the browser (debugger).
-	func sendLoop() { ... }
+controls whether a browser page is opened on the hopwatch page
 
-- HTML and Javascript source code wrapped in Go functions
+	-hopwatch.open=true
+		
+do not suspend the program if Break(..) is called
 
-	func js(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Content-Type", "text/javascript")
-		io.WriteString(w, `
-		var wsUri = "ws://" + window.location.hostname + ":" + window.location.port + "/hopwatch";
-		...
+	-hopwatch.break=true
+	
+debugger accepts connections on
 
-- Uses go-spew for dumping data structures
+	-hopwatch.host=localhost
+	-hopwatch.port=23456
+
 
 * debug.go
 
 Control hopwatch behavior from one source file
 
-.code debug.go
+.code watch.go
 
 * Example
 
-.code try_debug.go
+.code try_watch.go
 
-.image try_debug.png
+.image try_watch.png
 
-* Future directions
+* Pros and Cons
 
-- Frontend for GDB ?
-- Watches on variables
+Con
+
+- Requires program modification (import + Dump & Break calls)
+- Cannot debug third party code
+- No state modification possible (yet)
+
+Pro
+
+- Easy to setup
+- Less complex than GDB
+- Capture history of state and stack in browser page
