@@ -7,6 +7,5 @@ func main() {
 }
 
 func liveOfPi() {
-	// display and break
-	watch(true, math.Pi)
+	debug(math.Pi).Break()
 }

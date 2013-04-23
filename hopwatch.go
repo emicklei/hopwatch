@@ -175,9 +175,9 @@ func receiveLoop() {
 		if "quit" == cmd.Action {
 			hopwatchEnabled = false
 			log.Printf("[hopwatch] browser requests disconnect.\n")
-			fromBrowserChannel <- cmd
-			currentWebsocket.Close() // TODO is not detected by Chrome
+			currentWebsocket.Close()
 			currentWebsocket = nil
+			fromBrowserChannel <- cmd
 			break
 		} else {
 			fromBrowserChannel <- cmd
@@ -242,12 +242,17 @@ func Break(conditions ...bool) {
 // CallerOffset (default=2) allows you to change the file indicator in hopwatch.
 // Use this method when you wrap the .CallerOffset(..).Display(..).Break() in your own function.
 func CallerOffset(offset int) *Watchpoint {
-	wp := &Watchpoint{offset: offset}
-	if offset < 0 {
+	return (&Watchpoint{}).CallerOffset(offset)
+}
+
+// CallerOffset (default=2) allows you to change the file indicator in hopwatch.
+func (w *Watchpoint) CallerOffset(offset int) *Watchpoint {
+	if hopwatchEnabled && (offset < 0) {
 		log.Panicf("[hopwatch] ERROR: illegal caller offset:%v . watchpoint is disabled.\n", offset)
-		wp.disabled = true
+		w.disabled = true
 	}
-	return wp
+	w.offset = offset
+	return w
 }
 
 // Printf formats according to a format specifier and writes to the debugger screen. 
@@ -348,6 +353,6 @@ func channelExchangeCommands(toCmd command) {
 	// synchronize command exchange ; break only one goroutine at a time
 	debuggerMutex.Lock()
 	toBrowserChannel <- toCmd
-	_ = <-fromBrowserChannel
+	<-fromBrowserChannel
 	debuggerMutex.Unlock()
 }

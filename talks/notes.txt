@@ -1,11 +1,80 @@
-- Shows debug information in a browser while running a Go program
+http://godoc.org/code.google.com/p/go.talks/pkg/present
 
-- Can display any datastructure
+go get code.google.com/p/go.talks/pkg/present
 
-- Can suspend and resume the execution in any function
+run present in the talks folder
 
 
 * Future directions
 
 - Frontend for GDB ?
 - Watches on variables
+
+=====================================================================
+
+
+* Sending commands to the debugger page
+
+	func sendLoop() {
+		for {
+			next := <-toBrowserChannel
+			if "quit" == next.Action {
+				break
+			}
+			websocket.JSON.Send(currentWebsocket, &next)
+		}		
+	}
+
+
+
+* Receive commands from the debugger page
+
+	func receiveLoop() {
+		for {
+			var cmd command
+			if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
+				fromBrowserChannel <- command{Action: "quit"}
+				break
+			}
+			if "quit" == cmd.Action {
+				hopwatchEnabled = false
+				currentWebsocket.Close()
+				fromBrowserChannel <- cmd
+				break
+			} else {
+				fromBrowserChannel <- cmd
+			}
+		}
+	}
+
+
+
+* Synchronize channel read/writes
+
+	func channelExchangeCommands(toCmd command) {
+		debuggerMutex.Lock()
+		toBrowserChannel <- toCmd
+		<-fromBrowserChannel
+		debuggerMutex.Unlock()
+	}
+
+
+
+
+* HTML and Javascript wrapped in Go 
+
+	func html(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w,
+			`<!DOCTYPE html>
+	<meta charset="utf-8" />
+	<title>Hopwatch Debugger</title>
+	<head>
+	...
+
+Route assets to functions
+
+	http.HandleFunc("/hopwatch.html", html)
+	http.HandleFunc("/hopwatch.css", css)
+	http.HandleFunc("/hopwatch.js", js)
+
+Hopwatch is self-contained; no need to setup path for static content

@@ -7,20 +7,25 @@ package hopwatch
 import (
 	"bytes"
 	"github.com/davecgh/go-spew/spew"
+	"strings"
 )
 
 // Dump displays the passed parameters with newlines and additional debug information such as complete types and all pointer addresses used to indirect to the final value.
 // Delegates to spew.Fdump, see http://godoc.org/github.com/davecgh/go-spew/spew#Dump
 func Dump(a ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset: 2}
-	return wp.Dump(a...)
+	wp := &Watchpoint{offset: 3}
+	wp.Dump(a...)
+	wp.offset -= 1
+	return wp
 }
 
 // Dumpf formats and displays the passed parameters with newlines and additional debug information such as complete types and all pointer addresses used to indirect to the final value.
 // delegates to spew.Fprintf, see http://godoc.org/github.com/davecgh/go-spew/spew#Dump
 func Dumpf(format string, a ...interface{}) *Watchpoint {
-	wp := &Watchpoint{offset: 2}
-	return wp.Dumpf(format, a...)
+	wp := &Watchpoint{offset: 3}
+	wp.Dumpf(format, a...)
+	wp.offset -= 1
+	return wp
 }
 
 // Dump displays the passed parameters with newlines and additional debug information such as complete types and all pointer addresses used to indirect to the final value.
@@ -28,7 +33,7 @@ func Dumpf(format string, a ...interface{}) *Watchpoint {
 func (w *Watchpoint) Dump(a ...interface{}) *Watchpoint {
 	writer := new(bytes.Buffer)
 	spew.Fdump(writer, a...)
-	return w.printcontent(string(writer.Bytes()))
+	return w.printcontent(strings.TrimRight(string(writer.Bytes()), "\n"))
 }
 
 // Dumpf formats and displays the passed parameters with newlines and additional debug information such as complete types and all pointer addresses used to indirect to the final value.
