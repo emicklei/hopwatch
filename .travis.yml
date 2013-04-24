@@ -1,2 +1,4 @@
 language: go
-script: go get -d -v ./... && go build -v .
+before_install: go get -d -v ./... 
+install: go build -v .
+script: go test .
