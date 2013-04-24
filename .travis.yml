@@ -1,2 +1,2 @@
 language: go
-script: ./script/ci/run_build.sh
+script: go get -d -v ./... && go build -v .
