@@ -1,2 +1,2 @@
 language: go
-script: ./build4travis.sh
+script: ./script/ci/run_build.sh
