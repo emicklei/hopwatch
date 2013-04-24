@@ -1,2 +1,2 @@
 language: go
-script: "go get -d -v ./... && go build -v ."
+script: ./build4travis.sh
