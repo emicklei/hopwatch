@@ -216,7 +216,7 @@ func sendLoop() {
 // This allows for statements like hopwatch.Display("var",value).Break()
 type Watchpoint struct {
 	disabled bool
-	offset   int
+	offset   int // offset in the caller stack for highlighting source
 }
 
 // Printf formats according to a format specifier and writes to the debugger screen. 

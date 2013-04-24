@@ -3,7 +3,8 @@ debugging tool for Go
 
 Ernest Micklei
 Software Architect, bol.com
-http://ernestmicklei.com
+
+http://github.com/emicklei/hopwatch
 
 * What is Hopwatch?
 
@@ -40,6 +41,48 @@ Conditional break
 
 
 
+* Internals
+
+	currentWebsocket   *websocket.Conn
+	toBrowserChannel   = make(chan command)
+	fromBrowserChannel = make(chan command)
+	connectChannel     = make(chan command)
+	debuggerMutex      = sync.Mutex{}
+	
+	
+	//  take command from toBrowserChannel and send over websocket	
+	func sendLoop() {...}
+
+
+	// receive command from websocket and put on fromBrowserChannel	
+	func receiveLoop() {...}
+
+
+	// synchronize command exchange ; break only one goroutine at a time
+	debuggerMutex.Lock()
+	toBrowserChannel <- toCmd
+	<-fromBrowserChannel
+	debuggerMutex.Unlock()
+
+
+* HTML and Javascript wrapped in Go 
+
+	func html(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w,
+			`<!DOCTYPE html>
+	<meta charset="utf-8" />
+	<title>Hopwatch Debugger</title>
+	<head>
+	...
+
+Route assets to functions
+
+	http.HandleFunc("/hopwatch.html", html)
+	http.HandleFunc("/hopwatch.css", css)
+	http.HandleFunc("/hopwatch.js", js)
+
+Hopwatch is self-contained; no need to setup path for static content
+
 
 * Basic usage
 
@@ -64,6 +107,9 @@ Control hopwatch behavior from one source file
 .image try_debug.png
 
 
+
+
+
 * Hopwatch flags to override defaults
 
 disable hopwatch
@@ -86,15 +132,15 @@ tell the debugger to accepts connections on
 
 * Hopwatch
 
-:-(
+-
 
 - Requires program modification (import + Dump & Break calls)
 - Cannot debug third party code
-- No state modification possible
+- No stepping, just hop to the next Break
+- Unable to change state
 
-:-)
++
 
 - Easy to use
-- Less complex than GDB
-- Highlight source on break
-- Capture history of state and stack in browser page
+- Highlights source on break
+- Capture history of printed state and stack in browser page
