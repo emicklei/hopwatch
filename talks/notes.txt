@@ -59,6 +59,28 @@ run present in the talks folder
 	}
 
 
+* Basic usage
+
+.code no_debug.go
+
+
+
+
+
+* debug.go
+
+Control hopwatch behavior from one source file
+
+.code debug.go
+
+
+
+* Simplified usage
+
+.code try_debug.go
+
+.image try_debug.png
+
 
 
 * HTML and Javascript wrapped in Go 

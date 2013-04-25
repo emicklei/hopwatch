@@ -37,32 +37,31 @@ Conditional break
 	hopwatch.Printf("i=%v,j=%v",i,j).Break(j > 10)
 		
 
-* Show me Hopwatch
+* Hopwatch demo
 
 
 
 * Internals
 
-	currentWebsocket   *websocket.Conn
+	type command struct {
+		Action     string
+		Parameters map[string]string
+	}
+
+Channels for sending/receiving commands
+
 	toBrowserChannel   = make(chan command)
 	fromBrowserChannel = make(chan command)
 	connectChannel     = make(chan command)
-	debuggerMutex      = sync.Mutex{}
-	
-	
-	//  take command from toBrowserChannel and send over websocket	
+	debuggerMutex      = sync.Mutex{}        // to synchronize command i/o    
+		
+Loops for sending and receiving commands	
+
+	// take command from toBrowserChannel and send over websocket		
 	func sendLoop() {...}
 
-
-	// receive command from websocket and put on fromBrowserChannel	
+	// receive command from websocket and put on fromBrowserChannel		
 	func receiveLoop() {...}
-
-
-	// synchronize command exchange ; break only one goroutine at a time
-	debuggerMutex.Lock()
-	toBrowserChannel <- toCmd
-	<-fromBrowserChannel
-	debuggerMutex.Unlock()
 
 
 * HTML and Javascript wrapped in Go 
@@ -84,27 +83,7 @@ Route assets to functions
 Hopwatch is self-contained; no need to setup path for static content
 
 
-* Basic usage
 
-.code no_debug.go
-
-
-
-
-
-* debug.go
-
-Control hopwatch behavior from one source file
-
-.code debug.go
-
-
-
-* Simplified usage
-
-.code try_debug.go
-
-.image try_debug.png
 
 
 
