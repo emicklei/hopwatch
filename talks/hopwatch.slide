@@ -109,17 +109,16 @@ tell the debugger to accepts connections on
 	-hopwatch.port=23456
 
 
-* Hopwatch
-
--
+* Hopwatch limitations
 
 - Requires program modification (import + Dump & Break calls)
-- Cannot debug third party code
-- No stepping, just hop to the next Break
+- No stepping
 - Unable to change state
 
-+
+
+* Hopwatch benefits
 
 - Easy to use
-- Highlights source on break
+- Highlights source on Break()
 - Capture history of printed state and stack in browser page
+- Remote access
