@@ -163,6 +163,16 @@ func connectHandler(ws *websocket.Conn) {
 	}
 }
 
+func Disable() {
+	log.Print("[hopwatch] disabled by code.\n")
+	hopwatchEnabled = false
+}
+
+func Enable() {
+	log.Print("[hopwatch] enabled by code.\n")
+	hopwatchEnabled = true
+}
+
 // receiveLoop reads commands from the websocket and puts them onto a channel.
 func receiveLoop() {
 	for {
