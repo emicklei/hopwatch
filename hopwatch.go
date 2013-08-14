@@ -124,7 +124,7 @@ func open(uri string) error {
 // serve a (source) file for displaying in the debugger
 func gosource(w http.ResponseWriter, req *http.Request) {
 	fileName := req.FormValue("file")
-	// should check for permission?  
+	// should check for permission?
 	w.Header().Set("Cache-control", "no-store, no-cache, must-revalidate")
 	http.ServeFile(w, req, fileName)
 }
@@ -145,13 +145,13 @@ func listen() {
 }
 
 // connectHandler is a Http handler and is called on loading the debugger in a browser.
-// As soon as a command is received the receiveLoop is started. 
+// As soon as a command is received the receiveLoop is started.
 func connectHandler(ws *websocket.Conn) {
 	if currentWebsocket != nil {
 		log.Printf("[hopwatch] already connected to a debugger; Ignore this\n")
 		return
 	}
-	// remember the connection for the sendLoop	
+	// remember the connection for the sendLoop
 	currentWebsocket = ws
 	var cmd command
 	if err := websocket.JSON.Receive(currentWebsocket, &cmd); err != nil {
@@ -161,6 +161,16 @@ func connectHandler(ws *websocket.Conn) {
 		connectChannel <- cmd
 		receiveLoop()
 	}
+}
+
+func Disable() {
+	log.Print("[hopwatch] disabled by code.\n")
+	hopwatchEnabled = false
+}
+
+func Enable() {
+	log.Print("[hopwatch] enabled by code.\n")
+	hopwatchEnabled = true
 }
 
 // receiveLoop reads commands from the websocket and puts them onto a channel.
@@ -219,7 +229,7 @@ type Watchpoint struct {
 	offset   int // offset in the caller stack for highlighting source
 }
 
-// Printf formats according to a format specifier and writes to the debugger screen. 
+// Printf formats according to a format specifier and writes to the debugger screen.
 // It returns a new Watchpoint to send more or break.
 func Printf(format string, params ...interface{}) *Watchpoint {
 	wp := &Watchpoint{offset: 2}
@@ -255,7 +265,7 @@ func (w *Watchpoint) CallerOffset(offset int) *Watchpoint {
 	return w
 }
 
-// Printf formats according to a format specifier and writes to the debugger screen. 
+// Printf formats according to a format specifier and writes to the debugger screen.
 func (self *Watchpoint) Printf(format string, params ...interface{}) *Watchpoint {
 	self.offset += 1
 	var content string
@@ -267,7 +277,7 @@ func (self *Watchpoint) Printf(format string, params ...interface{}) *Watchpoint
 	return self.printcontent(content)
 }
 
-// Printf formats according to a format specifier and writes to the debugger screen. 
+// Printf formats according to a format specifier and writes to the debugger screen.
 func (self *Watchpoint) printcontent(content string) *Watchpoint {
 	_, file, line, ok := runtime.Caller(self.offset)
 	cmd := command{Action: "print"}
