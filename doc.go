@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Hopwatch is a debugging tool for Go programs.  
+Hopwatch is a debugging tool for Go programs.
 
 Hopwatch uses a (embedded) HTML5 application to connect to your program (using a Websocket).
 Using Hopwatch requires adding function calls at points of interest that allow you to watch program state and suspend the program.
@@ -15,7 +15,11 @@ The Display and Dump functions do not suspend the program ; it is like having lo
 Usage:
 
 	import (
-		"github.com/emicklei/hopwatch"
+		// use a tag
+		"gopkg.in/emicklei/hopwatch.v1"
+
+		// or use the master
+		// "github.com/emicklei/hopwatch"
 	)
 
 	func foo() {
@@ -32,7 +36,7 @@ Connect:
 Other code examples:
 
 	// zero or more conditions ; conditionally suspends program (or goroutine)
-	hopwatch.Break(i > 10,  j < 100)	
+	hopwatch.Break(i > 10,  j < 100)
 
 	// zero or more name,value pairs ; no program suspend
 	hopwatch.Display("i",i , "j",j")
@@ -44,7 +48,7 @@ Other code examples:
 	hopwatch.Dump(myVar1)
 
 	// format and display detailed (type, nesting) information using https://github.com/davecgh/go-spew
-	hopwatch.Dumpf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)	
+	hopwatch.Dumpf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)
 
 Flags:
 
@@ -54,10 +58,13 @@ Flags:
 	-hopwatch.host	tcp hostname of the listener address (default = localhost).
 	-hopwatch.port	tcp port of the listener address (default = 23456).
 
-Install:
+Install from master:
 
 	go get -u github.com/emicklei/hopwatch
 
+or from a tag:
+
+	go get gopkg.in/emicklei/hopwatch.v1
 
 Resources:
 
@@ -65,6 +72,6 @@ Resources:
 	http://ernestmicklei.com/2012/12/14/hopwatch-a-debugging-tool-for-go/  (blog)
 
 
-(c) 2012-2013, Ernest Micklei. MIT License
+(c) 2012-2014, Ernest Micklei. MIT License
 */
 package hopwatch
