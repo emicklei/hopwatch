@@ -1,8 +1,4 @@
-// Copyright 2012 Ernest Micklei. All rights reserved.
-// Use of this source code is governed by a MIT-style
-// license that can be found in the LICENSE file.
-
-// Copyright 2012,2013 Ernest Micklei. All rights reserved.
+// Copyright 2012,2014 Ernest Micklei. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -32,7 +28,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 			<div id="menu">
 				<a id="resume" class="buttonDisabled" href="javascript:actionResume();">F8 - Resume</a>
 				<a id="disconnect" class="buttonDisabled" href="javascript:actionDisconnect();">Disconnect</a>
-				<a class="buttonEnabled" href="http://go.pkgdoc.org/github.com/emicklei/hopwatch" target="_blank">About</a>
+				<a class="buttonEnabled" href="http://godoc.org/github.com/emicklei/hopwatch" target="_blank">About</a>
 			</div>
 		</div>
 	</div>

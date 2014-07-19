@@ -1,11 +1,10 @@
-// Copyright 2012,2013 Ernest Micklei. All rights reserved.
+// Copyright 2012,2014 Ernest Micklei. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
 package hopwatch
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"flag"
 	"fmt"
 	"log"
@@ -17,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"code.google.com/p/go.net/websocket"
 )
 
 // command is used to transport message to and from the debugger.
@@ -337,22 +338,22 @@ func suspend(callerOffset int, conditions ...bool) {
 	if ok {
 		cmd.addParam("go.file", file)
 		cmd.addParam("go.line", fmt.Sprint(line))
-		cmd.addParam("go.stack", trimStack(string(debug.Stack())))
+		cmd.addParam("go.stack", trimStack(string(debug.Stack()), fmt.Sprintf("%s:%d", file, line)))
 	}
 	channelExchangeCommands(cmd)
 }
 
 // Peel off the part of the stack that lives in hopwatch
-func trimStack(stack string) string {
+func trimStack(stack, fileAndLine string) string {
 	lines := strings.Split(stack, "\n")
 	c := 0
-	for _, line := range lines {
-		if strings.Index(line, "/hopwatch") == -1 { // means no function in this package
+	for _, each := range lines {
+		if strings.Index(each, fileAndLine) != -1 {
 			break
 		}
 		c++
 	}
-	return strings.Join(lines[c:], "\n")
+	return strings.Join(lines[4:], "\n")
 }
 
 // Put a command on the browser channel and wait for the reply command
