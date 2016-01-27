@@ -17,7 +17,7 @@ import (
 	"strings"
 	"sync"
 
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 )
 
 // command is used to transport message to and from the debugger.
