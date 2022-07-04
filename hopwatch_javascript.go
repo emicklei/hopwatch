@@ -24,10 +24,10 @@ func js(w http.ResponseWriter, req *http.Request) {
 		setupWebSocket();
 	}
 	function setupWebSocket() {		
-		websocket.onopen = function(evt) { onOpen(evt) };
-		websocket.onclose = function(evt) { onClose(evt) };
-		websocket.onmessage = function(evt) { onMessage(evt) };
-		websocket.onerror = function(evt) { onError(evt) };
+		websocket.addEventListener('open', onOpen);
+		websocket.addEventListener('close', onClose);
+		websocket.addEventListener('message', onMessage);
+		websocket.addEventListener('error', onError);
 	}
 	function onOpen(evt) {
 		connected = true;
@@ -36,6 +36,7 @@ func js(w http.ResponseWriter, req *http.Request) {
 		sendConnected();
 	}
 	function onClose(evt) {
+		console.log("onClose:",evt);
 		handleDisconnected();
 	}
 	function onMessage(evt) {

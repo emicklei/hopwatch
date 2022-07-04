@@ -140,6 +140,7 @@ func listen() {
 	} else {
 		log.Printf("[hopwatch] open http://%v/hopwatch.html ...\n", hostPort)
 	}
+	log.Printf("[hopwatch] listening to %v\n", hostPort)
 	if err := http.ListenAndServe(hostPort, nil); err != nil {
 		log.Printf("[hopwatch] failed to start listener:%v", err.Error())
 	}
@@ -201,7 +202,7 @@ func receiveLoop() {
 // If the command action is quit then abort the loop.
 func sendLoop() {
 	if currentWebsocket == nil {
-		log.Print("[hopwatch] no browser connection, wait for it ...")
+		log.Print("[hopwatch-exchange] no browser connection, wait for it ...")
 		cmd := <-connectChannel
 		if "quit" == cmd.Action {
 			return
@@ -213,7 +214,7 @@ func sendLoop() {
 			break
 		}
 		if currentWebsocket == nil {
-			log.Print("[hopwatch] no browser connection, wait for it ...")
+			log.Print("[hopwatch-exchange] no browser connection, wait for it ...")
 			cmd := <-connectChannel
 			if "quit" == cmd.Action {
 				break
