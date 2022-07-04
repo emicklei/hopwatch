@@ -62,10 +62,6 @@ Install from master:
 
 	go get -u github.com/emicklei/hopwatch
 
-or from a tag:
-
-	go get gopkg.in/emicklei/hopwatch.v1
-
 Resources:
 
 	https://github.com/emicklei/hopwatch (project)
