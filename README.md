@@ -10,4 +10,19 @@ On the hopwatch page, the developer can view debug information and choose to res
 
 ![How](hopwatch_how.png)
 
+
+## Distributed (work in progress)
+
+Hopwatch can be used in a distributed services architecture to hop and trace between services following an incoming request to downstream service.
+
+Consider the setup where the browser is sending a HTTP request to a GraphQL endpoint which calls a gRPC backend service, which calls a PostgreSQL Database server to perform a query. The result of that query needs to be transformed into a gRPC response which in turn needs to be transformed into a GraphQL response before transporting it back to the browser.
+
+We want to jump from client to server to server and back, for a given request. 
+To signal the upstream services that it should break on this request, the request must be annotated using a special HTTP header `x-hopwatch : your-correlation-name`.
+
+Each upstream server must have the hopwatch agent package included:
+
+    import _ "github.com/emicklei/hopwatch/agent"
+
+
 &copy; 2012-2022, http://ernestmicklei.com. MIT License 
