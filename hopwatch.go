@@ -90,7 +90,7 @@ func init() {
 			} else if i < len(os.Args) {
 				portString = os.Args[i+1]
 			}
-			port, err := strconv.ParseInt(portString, 10, 8)
+			port, err := strconv.ParseInt(portString, 10, 64)
 			if err != nil {
 				log.Panicf("[hopwatch] illegal port parameter:%v", err)
 			}

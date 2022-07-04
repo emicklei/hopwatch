@@ -14,13 +14,14 @@ func js(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, `
 	var wsUri = "ws://" + window.location.hostname + ":" + window.location.port + "/hopwatch";
 	var output;
-	var websocket = new WebSocket(wsUri);	
+	var websocket = null; // create at init
 	var connected = false;
 	var suspended = false;
 	var golineSize = 18;
 	
 	function init() {
 		output = document.getElementById("output");
+		websocket = new WebSocket(wsUri);
 		setupWebSocket();
 	}
 	function setupWebSocket() {		
