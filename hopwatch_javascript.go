@@ -1,4 +1,4 @@
-// Copyright 2012-2013 Ernest Micklei. All rights reserved.
+// Copyright 2012+ ernestmicklei.com. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 

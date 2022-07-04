@@ -1,4 +1,4 @@
-// Copyright 2012 Ernest Micklei. All rights reserved.
+// Copyright 2012+ ernestmicklei.com. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -71,7 +71,6 @@ Resources:
 	https://github.com/emicklei/hopwatch (project)
 	http://ernestmicklei.com/2012/12/14/hopwatch-a-debugging-tool-for-go/  (blog)
 
-
-(c) 2012-2014, Ernest Micklei. MIT License
+(c) 2012-2022+, Ernest Micklei. MIT License
 */
 package hopwatch

@@ -1,4 +1,4 @@
-// Copyright 2012,2014 Ernest Micklei. All rights reserved.
+// Copyright 2012+ ernestmicklei.com. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -44,7 +44,7 @@ func html(w http.ResponseWriter, req *http.Request) {
 		</div>
 	</div>
 	<div id="footer">
-		&copy; 2012-2013. <a href="http://github.com/emicklei/hopwatch" target="_blank">hopwatch on github.com</a>
+		&copy; 2012-2022. <a href="http://github.com/emicklei/hopwatch" target="_blank">hopwatch on github.com</a>
 	</div>
 </body>
 </html>
