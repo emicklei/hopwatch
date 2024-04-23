@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/emicklei/hopwatch/agent"
+	"github.com/emicklei/hopwatch"
 )
 
 func main() {
@@ -15,6 +15,6 @@ func main() {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	agent.Display("request", r).Break()
+	hopwatch.Display("request", r).Break()
 	io.WriteString(w, "hello hopper")
 }
